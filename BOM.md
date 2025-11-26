@@ -1,0 +1,72 @@
+# bill of materials for SLU LEDs display
+
+- ### arduino
+    - Arduino Nano V3 (USB-C)
+- ### Bulk capacitor
+    - aluminum electrolytic SMD
+    - 4mm x 5.4mm
+    - 10uf
+    - JLC
+        - C3343
+        - https://jlcpcb.com/partdetail/HonorElec-RVT1E100M0405/C3343
+- ### ICs
+    - all SOP16 package
+    - #### SIPO
+        - 74HC595
+        - JLC
+            - C79097
+            - https://jlcpcb.com/partdetail/80234-TM74HC595/C79097
+    - #### PISO
+        - 74HC165
+        - JLC
+            - C61060
+            - https://jlcpcb.com/partdetail/TexasInstruments-SN74HC165DR/C61060
+- ### Decoupling caps
+    - 1206 package
+    - 100nf
+    - JLC
+        - C24497
+        - https://jlcpcb.com/partdetail/25237-CL31B104KBCNNNC/C24497
+- ### LED x64
+    - 3528 package
+    - JLC
+        - WHITE
+            - C50327302
+            - https://jlcpcb.com/partdetail/52924801-67_21S_KK5C_H602633Z62T/C50327302
+        - BLUE
+            - C51933338
+            - https://jlcpcb.com/partdetail/Gui_guanglight-GL3528UB01/C51933338
+    
+- ### Resistors for LEDs x64
+    - 470 ohm | 1206 pacage
+    - JLC
+        - C4502 (extended, try to find basic)
+        - https://jlcpcb.com/partdetail/4909-1206W4F4700T5E/C4502
+- ### Buttons x8
+    - 4x3mm
+    - JLC
+        - C720477
+        - https://jlcpcb.com/partdetail/XUNPU-TS_1088AR02016/C720477
+- ### Resistors for buttons x8
+    - 10k ohm | 1206 pacage
+    - JLC
+        - C17902
+        - https://jlcpcb.com/partdetail/18590-1206W4F1002T5E/C17902
+- ### Battery
+    - single cell 18650 li-ion
+- ### Battery charging module
+    - from amazon
+    - https://a.co/d/5A0npPp
+    - RIGHT ANGLE HEADERS TO ATTACH TO BOARD
+        - https://a.co/d/j1yIO91
+- ### Schottky diode
+    - SS34
+    - SMA package
+    - JLC
+        - C8678
+        - https://jlcpcb.com/partdetail/MDD_Microdiode_Semiconductor-SS34/C8678
+- ### 5-pin out for external LCD
+    - 5 pins, 2.54mm pitch
+- ### Pins for battery
+    - 2 pins, right angle bend
+    - 2.54mm pitch

@@ -1,0 +1,10 @@
+Reference,Qty,Value,DNP,Exclude from BOM,Exclude from Board,Footprint,Datasheet,LCSC Part #
+bc1,1,bc10µf_5054,,,,slu_leds_lib:CP_Elec_4x5.4,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8588886801545375744,C3343
+"r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20,r21,r22,r23,r24,r25,r26,r27,r28,r29,r30,r31,r32,r33,r34,r35,r36,r37,r38,r39,r40,r41,r42,r43,r44,r45,r46,r47,r48,r49,r50,r51,r52,r53,r54,r55,r56,r57,r58,r59,r60,r61,r62,r63,r64",64,470Ω,,,,slu_leds_lib:r_470Ω_1206,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8586177295745241088,C4502
+DIO1,1,SS34,,,,slu_leds_lib:D_SMA,https://www.vishay.com/docs/88751/ss32.pdf,C8678
+"r65,r66,r67,r68,r69,r70,r71,r72",8,10KΩ,,,,slu_leds_lib:r_10KΩ_1206,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8579705876598476800,C17902
+"c1,c2,c3,c4,c5,c6,c7,c8,c9",9,100nf,,,,a_detolib:cap1206,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8579707339533963264,C24497
+ICI1,1,74HC165,,,,slu_leds_lib:sop16_hc165,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8603367375115079680,C61060
+"ICO1,ICO2,ICO3,ICO4,ICO5,ICO6,ICO7,ICO8",8,74HC595,,,,slu_leds_lib:sop16_hc595,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8586176303707377664,C79097
+"b1,b2,b3,b4,b5,b6,b7,b8",8,btn,,,,slu_leds_lib:btn_4x3,https://jlcpcb.com/api/file/downloadByFileSystemAccessId/8588886944068096000,C720477
+"d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,d11,d12,d13,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25,d26,d27,d28,d29,d30,d31,d32,d33,d34,d35,d36,d37,d38,d39,d40,d41,d42,d43,d44,d45,d46,d47,d48,d49,d50,d51,d52,d53,d54,d55,d56,d57,d58,d59,d60,d61,d62,d63,d64",64,LED,,,,slu_leds_lib:blue_led_3528,,C51933338
