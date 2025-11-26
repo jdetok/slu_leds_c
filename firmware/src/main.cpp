@@ -1,33 +1,56 @@
 #include <Arduino.h>
+#include "slu_leds.h"
 
-// put function declarations here:
-// int myFunction(int, int);
 
-// arduino pins for 74HC595 (lights)
-#define PIN_ICO_SE 2
-#define PIN_ICO_OE 3
-#define PIN_ICO_LA 4
-#define PIN_ICO_CL 5
+ 
+bool ONOFF;
+bool CURRENT;
 
-// arduino pins for 74HC165 (buttons)
-#define PIN_ICI_PL 6
-#define PIN_ICI_CP 7
-#define PIN_ICI_SE 8
-#define PIN_ICI_CE 9
+void setup_pins(int pins_arr[], int* inout) {
+    for (int i = 0; i < (sizeof(pins_arr)) / sizeof(pins_arr[0]); i++) {
+        pinMode(pins_arr[i], inout);
+    }
+}
 
-// arduino pins for 74HC595 (optional external LCD)
-#define PIN_LCD_LA 10
-#define PIN_LCD_CL 11
-#define PIN_LCD_SE 12
+void leds_onoff(bool on) {
+    digitalWrite(PIN_ICO_LA, LOW); // latch low
+    int mask = on ? 0xFF : 0x00; 
 
-// arduino pins for power switch
-#define PIN_PWR_SW 13
+    for (int i = 0; i < NUM_SR; i++) {
+        shiftOut(PIN_ICO_SE, PIN_ICO_CL, MSBFIRST, mask);
+    }
+    digitalWrite(PIN_ICO_LA, HIGH); // latch high (output the bits)
+    delay(1000);
+}
+
+bool check_pwr_sw(bool current) {
+    bool onoff = digitalRead(PIN_PWR_SW);
+    if (onoff != current) {
+        if (onoff) {
+            Serial.println("turning ofn");
+            leds_onoff(true);
+            return true;
+        } else {
+            Serial.println("turning off");
+            leds_onoff(false);
+            return false;
+        }
+    } else {
+        return onoff;
+    }
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    setup_pins(PINS_IN, INPUT);
+    setup_pins(PINS_OUT, OUTPUT);
+    Serial.begin(9600);
+
+    analogWrite(PIN_ICO_OE, 100); // set oe low
+    CURRENT, ONOFF = true;
+    leds_onoff(CURRENT);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+    Serial.println("testing");
+    ONOFF = check_pwr_sw(CURRENT);
 }
