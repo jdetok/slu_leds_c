@@ -1,12 +1,11 @@
 #include "slu_leds.h"
 
 // global LED brightness struct
-brightness Brightness;
-brightness* BRT = &Brightness;
+// brightness Brightness;
+LED_Brightness* LEDS = new LED_Brightness(255, 155);
 
 // global buttons state
-state State = {0, 0, {0, 1, 2, 3, 4, 5, 6, 7}};
-state* BTN_STATE = &State;
+BTN_State* BTNS = new BTN_State();
 
 void setup() {
     setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
@@ -14,39 +13,33 @@ void setup() {
     Serial.begin(9600);
 
     analogWrite(PIN_ICO_OE, 100); // set oe low
-    // CURRENT = true; 
-    BRT->onoff = true;
-    leds_onoff(BRT->onoff);
+
+    LEDS->onoff = true;
+    leds_onoff(LEDS->onoff);
     
     // set default min/max brightness & starting pulse direction
-    BRT->min = 255;
-    BRT->max = 155;
-    BRT->dir = -1;
+    
 }
 
 void loop() {
-    pulse(BRT);
-
     // check if power switch is switched
-    bool newOnOff = check_pwr_sw(BRT->onoff, BRT->lvl);
-    if (newOnOff != BRT->onoff) {
+    bool newOnOff = check_pwr_sw(LEDS->onoff, LEDS->lvl);
+    if (newOnOff != LEDS->onoff) {
+        Serial.println("onoff");
         leds_onoff(newOnOff);
     }
 
-    // Serial.print("brightness: ");
-    // Serial.println(BRT); 
-    
-    uint8_t state = button_state();
+    BTNS->update();
+
+    LEDS->adjust(0, 4, BTNS->raw);
 
     // Serial.print("button state: ");
-    // Serial.println(state); 
-
-    bool btn_state = check_button(state, BTN_STATE->buttons[3]);
+    // printB(BTN_STATE->persist);
     
-    Serial.print("button ");
-    Serial.print(BTN_STATE->buttons[3]);
-    Serial.println(btn_state ? " on" : " off");
+    // if (BTN_STATE->persist > 0) {
+//     pulse(BRT);    
+    // }
 
-
-    delayMicroseconds(1);
+    delay(100);
+    // delayMicroseconds(1);
 }
