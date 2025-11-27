@@ -28,15 +28,38 @@
 // number of shift registers
 #define NUM_SR 4
 
+// arrays and sizes for pin setup
 extern const int PINS_IN[];;
 extern const size_t PINS_IN_COUNT;
 extern const int PINS_OUT[];
 extern const size_t PINS_OUT_COUNT ;
 
-void leds_onoff(bool on);
+// LED brightness control
+struct brightness {
+    uint8_t lvl; // brightness level
+    uint8_t min; // minimum brightness (0-255, higher the number, LOWER the brighness)
+    uint8_t max; // maximum brightness (0-255, lower the brighter)
+    int dir; // direction for pulse (1 or -1)
+    bool onoff;
+};
+
+// buttons state
+struct state {
+    uint8_t persist; // persistent state that gets updated
+    uint8_t raw; // raw byte to write to from button_state
+    int buttons[8]; // buttons 0-7
+};
+
+// pin setup - uses arrays and sizes from above
 void setup_pins(const int* pins_arr, size_t count, uint8_t mode);
+
+// state (buttons/switches) functions
 bool check_pwr_sw(bool current, uint8_t brt);
-void pulse();
 uint8_t button_state();
 bool check_button(uint8_t state, int btn);
+
+// led control functions
+void leds_onoff(bool on);
+void pulse(brightness* PBRT);
+
 #endif

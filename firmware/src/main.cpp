@@ -1,14 +1,12 @@
 #include "slu_leds.h"
 
-bool ONOFF;
+// global LED brightness struct
+brightness Brightness;
+brightness* BRT = &Brightness;
 
-uint8_t BRT;
-uint8_t MIN_BRT = 255;
-uint8_t MAX_BRT = 155;
-int DIR = -1;
-
-// bool CURRENT;
-
+// global buttons state
+state State = {0, 0, {0, 1, 2, 3, 4, 5, 6, 7}};
+state* BTN_STATE = &State;
 
 void setup() {
     setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
@@ -17,18 +15,21 @@ void setup() {
 
     analogWrite(PIN_ICO_OE, 100); // set oe low
     // CURRENT = true; 
-    ONOFF = true;
-    leds_onoff(ONOFF);
+    BRT->onoff = true;
+    leds_onoff(BRT->onoff);
     
-    BRT = MIN_BRT; 
+    // set default min/max brightness & starting pulse direction
+    BRT->min = 255;
+    BRT->max = 155;
+    BRT->dir = -1;
 }
 
 void loop() {
-    pulse();
+    pulse(BRT);
 
     // check if power switch is switched
-    bool newOnOff = check_pwr_sw(ONOFF, BRT);
-    if (newOnOff != ONOFF) {
+    bool newOnOff = check_pwr_sw(BRT->onoff, BRT->lvl);
+    if (newOnOff != BRT->onoff) {
         leds_onoff(newOnOff);
     }
 
@@ -40,64 +41,12 @@ void loop() {
     // Serial.print("button state: ");
     // Serial.println(state); 
 
-    bool btn_state = check_button(state, 0);
-    Serial.print("button is ");
-    Serial.println(btn_state ? "on" : "off");
+    bool btn_state = check_button(state, BTN_STATE->buttons[3]);
+    
+    Serial.print("button ");
+    Serial.print(BTN_STATE->buttons[3]);
+    Serial.println(btn_state ? " on" : " off");
 
 
     delayMicroseconds(1);
-}
-
-void setup_pins(const int* pins_arr, size_t count, uint8_t mode) {
-    for (size_t i = 0; i < count; i++) {
-        pinMode(pins_arr[i], mode);
-    }
-}
-
-
-bool check_pwr_sw(bool current, uint8_t brt) {
-    bool onoff = digitalRead(PIN_PWR_SW);
-    if (onoff != current) {
-        if (onoff) {
-            analogWrite(PIN_ICO_OE, brt);
-            Serial.println("turning ofn");
-            leds_onoff(true);
-            return true;
-        } else {
-            digitalWrite(PIN_ICO_OE, HIGH);
-            Serial.println("turning off");
-            leds_onoff(false);
-            return false;
-        }
-    } else {
-        return onoff;
-    }
-}
-
-void pulse() {
-    if (BRT >= MIN_BRT) {
-        DIR = -1;
-    } else if (BRT == MAX_BRT) {
-        DIR = 1;
-    }
-    BRT += DIR;
-    analogWrite(PIN_ICO_OE, BRT);
-}
-
-uint8_t button_state() {
-    // pulse load pin
-    digitalWrite(PIN_ICI_PL, LOW);
-    delayMicroseconds(5);
-    digitalWrite(PIN_ICI_PL, HIGH);
-    delayMicroseconds(5);
-    
-    digitalWrite(PIN_ICI_CP, HIGH);
-    digitalWrite(PIN_ICI_CE, LOW);
-    uint8_t incoming = shiftIn(PIN_ICI_SE, PIN_ICI_CP, MSBFIRST);
-    digitalWrite(PIN_ICI_CE, HIGH);
-    return incoming;
-}
-
-bool check_button(uint8_t state, int btn) {
-    return state & (1 << btn);
 }
