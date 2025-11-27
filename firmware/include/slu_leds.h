@@ -1,5 +1,8 @@
-// #ifndef SLU_LEDS_H
+#ifndef SLU_LEDS_H
 #define SLU_LEDS_H
+
+#include <Arduino.h>
+
 // arduino pins for 74HC595 (lights)
 #define PIN_ICO_SE 2 // IC pin 14 (SERIAL)
 #define PIN_ICO_OE 3 // IC pin 13 (OUTPUT ENABLE)
@@ -25,16 +28,15 @@
 // number of shift registers
 #define NUM_SR 4
 
-const int PINS_IN[] = { PIN_ICI_SE, PIN_PWR_SW };
-const int PINS_OUT[] = {
-    PIN_ICO_SE,
-    PIN_ICO_OE,
-    PIN_ICO_LA,
-    PIN_ICO_CL,
-    PIN_ICI_PL,
-    PIN_ICI_CP,
-    PIN_ICI_CE,
-    PIN_LCD_LA,
-    PIN_LCD_CL,
-    PIN_LCD_SE
-};
+extern const int PINS_IN[];;
+extern const size_t PINS_IN_COUNT;
+extern const int PINS_OUT[];
+extern const size_t PINS_OUT_COUNT ;
+
+void leds_onoff(bool on);
+void setup_pins(const int* pins_arr, size_t count, uint8_t mode);
+bool check_pwr_sw(bool current, uint8_t brt);
+void pulse();
+uint8_t button_state();
+bool check_button(uint8_t state, int btn);
+#endif

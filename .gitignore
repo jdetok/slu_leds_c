@@ -1,3 +1,4 @@
 *.lck
-.DS_Store
+*.DS_Store
 *cache
+*slu_leds_c-backups
