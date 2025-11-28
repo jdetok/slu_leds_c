@@ -1,6 +1,8 @@
 #include "slu_leds.h"
 
-Buttons::Buttons() : persist(0), raw(0), last(0) {}
+// ici::ici(int pl, int cp, int se, int ce) : load(pl), cp(cp), data(se), ce(ce) {}; 
+
+Buttons::Buttons(ici* ic) : ic(ic), persist(0), raw(0), last(0) {}
 
 // read byte from 74HC165
 uint8_t Buttons::read() {

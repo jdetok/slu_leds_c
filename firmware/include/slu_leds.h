@@ -34,46 +34,71 @@ extern const size_t PINS_IN_COUNT;
 extern const int PINS_OUT[];
 extern const size_t PINS_OUT_COUNT ;
 
+// 74HC165
+struct ico {
+    uint8_t data;
+    uint8_t out;
+    uint8_t latch;
+    uint8_t clock;
+
+    // ico(int se, int oe, int la, int cl);
+    ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
+};
+// 74HC165
+struct ici {
+    uint8_t load;
+    uint8_t cp;
+    uint8_t data;
+    uint8_t ce;
+    // ici(int pl, int cp, int se, int ce);
+    ici() : load(PIN_ICI_PL), cp(PIN_ICI_CP), data(PIN_ICI_SE), ce(PIN_ICI_CE) {};
+};
+
 // Lightsrightness control
 struct Lights {
-    int btn_up; // brightness up button
-    int btn_dn; // brightness down button
-    int btn_md; // mode button
+    ico* ic;
     uint8_t lvl; // brightness level
     uint8_t minm; // minimum brightness (0-255, higher the number, LOWER the brighness)
     uint8_t maxm; // maximum brightness (0-255, lower the brighter)
     int dir; // direction for pulse (1 or -1)
     bool onoff;
 
-    Lights(int min_brt, int max_brt);
-    void adjust(int btn_up, int btn_down, uint8_t b);
+    Lights(ico* ic, int min_brt, int max_brt);
     void solid();
     void pulse();
 };
 
 // EIGHT BUTTONS - state is stored in a uint8_t, each bit used as a flag
 struct Buttons {
+    ici* ic;
     uint8_t persist;
     uint8_t raw;
     uint8_t last;
     int btns[8];
 
-    Buttons();
+    Buttons(ici* ic);
     uint8_t read();
     void update();
     bool pressed(int btn);
 };
 
+struct Control {
+    Buttons* btns;
+    Lights* leds;
+
+    int btn_brt_up;
+    int btn_brt_down;
+
+    Control(Buttons* b, Lights* l);
+    void adjust_brightness();
+    int amt_to_change();
+    void brt_up(int amt);
+    void brt_down(int amt);
+
+};
 
 // pin setup - uses arrays and sizes from above
 void setup_pins(const int* pins_arr, size_t count, uint8_t mode);
-
-// state (buttons/switches) functions
-bool check_pwr_sw(bool current, uint8_t brt);
-
-// Lightsontrol functions
-void leds_onoff(bool on);
-
 
 void printB(uint8_t b);
 
