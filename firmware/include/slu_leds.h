@@ -2,6 +2,7 @@
 #define SLU_LEDS_H
 
 #include <Arduino.h>
+#include "lcd.h"
 
 // arduino pins for 74HC595 (lights)
 #define PIN_ICO_SE 2 // IC pin 14 (SERIAL)
@@ -58,22 +59,25 @@ struct ici {
 };
 
 // Lightsrightness control
-struct Lights {
+class Lights {
+public: 
     ico* ic;
-    uint8_t lvl; // brightness level
     uint8_t minm; // minimum brightness (0-255, higher the number, LOWER the brighness)
     uint8_t maxm; // maximum brightness (0-255, lower the brighter)
     int dir; // direction for pulse (1 or -1)
+    uint8_t lvl; // brightness level
     bool onoff;
 
     Lights(ico* ic, int min_brt, int max_brt);
     void off();
     void out();
     void pulse();
+    void bit_chaser(bool rev);
 };
 
 // EIGHT BUTTONS - state is stored in a uint8_t, each bit used as a flag
-struct Buttons {
+class Buttons {
+public:    
     ici* ic;
     uint8_t persist;
     uint8_t raw;
@@ -93,9 +97,11 @@ struct Buttons {
     bool pressed(int btn);
 };
 
-struct Control {
+class Control {
+public:
     Buttons* btns;
     Lights* leds;
+    LCD595* lcd;
 
     int pwr_sw;
 
@@ -104,7 +110,7 @@ struct Control {
 
     int delay_time;
 
-    Control(Buttons* b, Lights* l, uint8_t pwr_sw);
+    Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
     void Set();
     void set_brightness();
     int amt_to_change();

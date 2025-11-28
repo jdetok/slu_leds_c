@@ -45,3 +45,30 @@ void Lights::pulse() {
     lvl += dir;
     out();
 }
+
+void Lights::bit_chaser(bool rev) {
+    uint8_t total_bits = NUM_SR * 8;
+    uint8_t bytes[NUM_SR];
+
+    for (uint8_t step = 0; step < total_bits; step++) {
+        uint8_t bit_pos = rev ? (total_bits - 1 - step) : step;
+
+        for (uint8_t i = 0; i < NUM_SR; i++) {
+            bytes[i] = 0;
+        }
+
+         uint8_t byte_index = bit_pos / 8;
+        uint8_t bit_index  = 7 - (bit_pos % 8);
+
+        bytes[byte_index] |= (1 << bit_index);
+
+        digitalWrite(ic->latch, LOW);
+
+        for (int8_t b = NUM_SR - 1; b >= 0; b--) {
+            out();
+            shiftOut(ic->data, ic->clock, MSBFIRST, bytes[b]);
+        }
+
+        digitalWrite(ic->latch, HIGH);
+    }
+}

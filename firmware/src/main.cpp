@@ -12,8 +12,11 @@ Lights* LEDS = new Lights(ic_leds, 255, 155);
 // global buttons state
 Buttons* BTNS = new Buttons(ic_btns);
 
-// selector
-Control* CTRL = new Control(BTNS, LEDS, PIN_PWR_SW);
+// optional LCD screen
+LCD595* LCD = new LCD595(PIN_LCD_SE, PIN_LCD_CL, PIN_LCD_LA);
+
+// main control section
+Control* CTRL = new Control(BTNS, LEDS, LCD, PIN_PWR_SW);
 
 void setup() {
     Serial.begin(9600);
@@ -37,11 +40,17 @@ void setup() {
 
     CTRL->leds->lvl = 250;
     CTRL->leds->out();
+
+    CTRL->lcd->begin();
+    CTRL->lcd->setCursor(0,0);
+    CTRL->lcd->print("HELLO");
+
+    CTRL->lcd->setCursor(0,1); 
+    CTRL->lcd->print("WORLD");
+
 }
 
 void loop() {
     CTRL->Set();
-    // CTRL->btns->update();
-    // CTRL->set_brightness();
     delay(CTRL->delay_time);
 }
