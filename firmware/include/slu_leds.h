@@ -64,6 +64,7 @@ struct Lights {
     bool onoff;
 
     Lights(ico* ic, int min_brt, int max_brt);
+    void off();
     void solid();
     void pulse();
 };
@@ -74,7 +75,15 @@ struct Buttons {
     uint8_t persist;
     uint8_t raw;
     uint8_t last;
-    int btns[8];
+
+    uint8_t brt_up;
+    uint8_t brt_dn;
+    uint8_t mode1;
+    uint8_t mode2;
+    uint8_t mode3;
+    uint8_t mult1;
+    uint8_t mult2;
+    uint8_t rev;
 
     Buttons(ici* ic);
     uint8_t read();
@@ -86,10 +95,10 @@ struct Control {
     Buttons* btns;
     Lights* leds;
 
-    int btn_brt_up;
-    int btn_brt_down;
+    int pwr_sw;
 
-    Control(Buttons* b, Lights* l);
+    Control(Buttons* b, Lights* l, uint8_t pwr_sw);
+    void Set();
     void adjust_brightness();
     int amt_to_change();
     void brt_up(int amt);

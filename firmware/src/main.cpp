@@ -13,22 +13,30 @@ Lights* LEDS = new Lights(ic_leds, 255, 155);
 Buttons* BTNS = new Buttons(ic_btns);
 
 // selector
-Control* CTRL = new Control(BTNS, LEDS);
+Control* CTRL = new Control(BTNS, LEDS, PIN_PWR_SW);
 
 void setup() {
-    setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
-    setup_pins(PINS_OUT, PINS_OUT_COUNT, OUTPUT);
     Serial.begin(9600);
 
-    analogWrite(PIN_ICO_OE, 100); // set oe low
+    setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
+    setup_pins(PINS_OUT, PINS_OUT_COUNT, OUTPUT);
 
-    CTRL->btn_brt_down = 2;
-    CTRL->btn_brt_up = 3;
+    CTRL->btns->brt_dn = 0;
+    CTRL->btns->brt_up = 1;
+    CTRL->btns->mode1 = 2;
+    CTRL->btns->mode2 = 3;
+    CTRL->btns->mode3 = 4;
+    CTRL->btns->mult1 = 5;
+    CTRL->btns->mult2 = 6;
+    CTRL->btns->rev = 7;
+
+    analogWrite(CTRL->leds->ic->out, 100); // set oe low
 }
 
 void loop() {
-    CTRL->btns->update();
-    CTRL->adjust_brightness();
+    CTRL->Set();
+    // CTRL->btns->update();
+    // CTRL->adjust_brightness();
 
     delay(100);
 }

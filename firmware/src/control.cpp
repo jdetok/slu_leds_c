@@ -1,13 +1,27 @@
 #include "slu_leds.h"
 
-Control::Control(Buttons* b, Lights* l) : btns(b), leds(l) {};
+Control::Control(Buttons* b, Lights* l, uint8_t pwr_sw) : btns(b), leds(l), pwr_sw(pwr_sw) {};
+
+void Control::Set() {
+    if (digitalRead(pwr_sw) == LOW) {
+        leds->off();
+        return;
+    }
+    btns->update();
+    if (!btns->pressed(btns->mode1)) {
+        adjust_brightness();
+    } else {
+        leds->pulse();
+    }
+    
+}
 
 void Control::adjust_brightness() {
     int amt = amt_to_change();
-    if (btns->raw & (1 << btn_brt_up)) {
+    if (btns->raw & (1 << btns->brt_up)) {
         brt_up(amt);
     }
-    if (btns->raw & (1 << btn_brt_down)) {
+    if (btns->raw & (1 << btns->brt_dn)) {
         brt_down(amt);
     }
     analogWrite(PIN_ICO_OE, leds->lvl);
