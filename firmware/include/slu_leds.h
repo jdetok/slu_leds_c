@@ -43,6 +43,8 @@ struct ico {
 
     // ico(int se, int oe, int la, int cl);
     ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
+    void empty();
+    void fill();
 };
 // 74HC165
 struct ici {
@@ -52,6 +54,7 @@ struct ici {
     uint8_t ce;
     // ici(int pl, int cp, int se, int ce);
     ici() : load(PIN_ICI_PL), cp(PIN_ICI_CP), data(PIN_ICI_SE), ce(PIN_ICI_CE) {};
+    uint8_t read();
 };
 
 // Lightsrightness control
@@ -65,7 +68,7 @@ struct Lights {
 
     Lights(ico* ic, int min_brt, int max_brt);
     void off();
-    void solid();
+    void out();
     void pulse();
 };
 
@@ -86,7 +89,6 @@ struct Buttons {
     uint8_t rev;
 
     Buttons(ici* ic);
-    uint8_t read();
     void update();
     bool pressed(int btn);
 };
@@ -97,9 +99,14 @@ struct Control {
 
     int pwr_sw;
 
+    bool onoff_now;
+    bool onoff_last;
+
+    int delay_time;
+
     Control(Buttons* b, Lights* l, uint8_t pwr_sw);
     void Set();
-    void adjust_brightness();
+    void set_brightness();
     int amt_to_change();
     void brt_up(int amt);
     void brt_down(int amt);

@@ -3,28 +3,47 @@
 Control::Control(Buttons* b, Lights* l, uint8_t pwr_sw) : btns(b), leds(l), pwr_sw(pwr_sw) {};
 
 void Control::Set() {
-    if (digitalRead(pwr_sw) == LOW) {
-        leds->off();
+    int sw_status = digitalRead(pwr_sw);
+    if (sw_status == LOW) {
+        onoff_now = false;
+        if (onoff_last) {
+            Serial.println("off");
+            leds->ic->empty();
+            leds->off();
+        }
+        onoff_last = false;
         return;
+    } else {
+        onoff_now = true;
+        if (!(onoff_last)) {
+            Serial.println("on");
+            leds->ic->fill();
+        }
+        onoff_last = true;
     }
     btns->update();
-    if (!btns->pressed(btns->mode1)) {
-        adjust_brightness();
-    } else {
+    set_brightness();    
+    if ((btns->pressed(btns->mode1))) {
+        Serial.println("pulse on");
+        delay_time = 10;
         leds->pulse();
+    } else {
+        delay_time = 75;
     }
     
 }
 
-void Control::adjust_brightness() {
+void Control::set_brightness() {
     int amt = amt_to_change();
     if (btns->raw & (1 << btns->brt_up)) {
+        Serial.println("up");
         brt_up(amt);
     }
     if (btns->raw & (1 << btns->brt_dn)) {
+        Serial.println("down");
         brt_down(amt);
     }
-    analogWrite(PIN_ICO_OE, leds->lvl);
+    leds->out();
 }
 
 int Control::amt_to_change() {

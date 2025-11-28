@@ -1,24 +1,39 @@
 #include "slu_leds.h"
 
-Lights::Lights(ico* ic, int min_brt, int max_brt) {
-    ic = ic;
-    minm = min_brt;
-    maxm = max_brt;
-    dir = -1;
-}
+// Lights::Lights(ico* ic, int min_brt, int max_brt) {
+//     ic = ic;
+//     minm = min_brt;
+//     maxm = max_brt;
+//     dir = -1;
+// }
+Lights::Lights(ico* ic, int min_brt, int max_brt)
+    : ic(ic), minm(min_brt), maxm(max_brt), dir(-1), lvl(255), onoff(true)
+{}
 
-void Lights::off() {
-    // for (int i = 0; i < NUM_SR; i++) {
-    //     shiftOut(ic->data, ic->clock, MSBFIRST, 0x00);
-    // }
-    analogWrite(ic->out, 255);
-}
-
-void Lights::solid() {
-    for (int i = 0; i < NUM_SR; i++) {
-        shiftOut(ic->data, ic->clock, MSBFIRST, 0xFF);
-    }
+void Lights::out() {
     analogWrite(ic->out, lvl);
+}
+
+void ico::empty() {
+    Serial.println("emptying");
+    digitalWrite(latch, LOW);
+    for (int i = 0; i < NUM_SR; i++) {
+        shiftOut(data, clock, MSBFIRST, 0x00);
+    }
+    digitalWrite(latch, HIGH);
+}
+void ico::fill() {
+    Serial.println("filling");
+    digitalWrite(latch, LOW);
+    for (int i = 0; i < NUM_SR; i++) {
+        shiftOut(data, clock, MSBFIRST, 0xFF);
+        printB(0xFF);
+    }
+    digitalWrite(latch, HIGH);
+}
+void Lights::off() {
+    lvl = 255;
+    out();
 }
 
 void Lights::pulse() {
@@ -28,5 +43,5 @@ void Lights::pulse() {
         dir = 1;
     }
     lvl += dir;
-    analogWrite(PIN_ICO_OE, lvl);
+    out();
 }

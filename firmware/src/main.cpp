@@ -30,13 +30,18 @@ void setup() {
     CTRL->btns->mult2 = 6;
     CTRL->btns->rev = 7;
 
-    analogWrite(CTRL->leds->ic->out, 100); // set oe low
+    CTRL->leds->onoff = true;
+    CTRL->leds->ic->fill();
+
+    CTRL->delay_time = 100;
+
+    CTRL->leds->lvl = 250;
+    CTRL->leds->out();
 }
 
 void loop() {
     CTRL->Set();
     // CTRL->btns->update();
-    // CTRL->adjust_brightness();
-
-    delay(100);
+    // CTRL->set_brightness();
+    delay(CTRL->delay_time);
 }

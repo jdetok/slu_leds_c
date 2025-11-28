@@ -5,22 +5,22 @@
 Buttons::Buttons(ici* ic) : ic(ic), persist(0), raw(0), last(0) {};
 
 // read byte from 74HC165
-uint8_t Buttons::read() {
-    digitalWrite(PIN_ICI_PL, LOW);
+uint8_t ici::read() {
+    digitalWrite(load, LOW);
     delayMicroseconds(5);
-    digitalWrite(PIN_ICI_PL, HIGH);
+    digitalWrite(load, HIGH);
     delayMicroseconds(5);
 
-    digitalWrite(PIN_ICI_CP, HIGH);
-    digitalWrite(PIN_ICI_CE, LOW);
-    uint8_t incoming = shiftIn(PIN_ICI_SE, PIN_ICI_CP, MSBFIRST);
-    digitalWrite(PIN_ICI_CE, HIGH);
+    digitalWrite(cp, HIGH);
+    digitalWrite(ce, LOW);
+    uint8_t incoming = shiftIn(data, cp, MSBFIRST);
+    digitalWrite(ce, HIGH);
     return ~incoming;
 }
 
 // find bits which went from 0 to 1, flip only those bits in persisted state
 void Buttons::update() {
-    raw = read();
+    raw = ic->read();
     uint8_t rising = raw & ~last;
     persist ^= rising;
     last = raw;
@@ -29,7 +29,6 @@ void Buttons::update() {
 bool Buttons::pressed(int btn) {
     return persist & (1 << btn);
 }
-
 
 // print all 8 bits in a byte
 void printB(uint8_t b) {
