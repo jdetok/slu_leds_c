@@ -1,6 +1,6 @@
 #include "slu_leds.h"
 
-LED_Brightness::LED_Brightness(int min_brt, int max_brt) {
+Lights::Lights(int min_brt, int max_brt) {
     minm = min_brt;
     maxm = max_brt;
     dir = -1;
@@ -17,7 +17,14 @@ void leds_onoff(bool on) {
     // delay(1000);
 }
 
-void LED_Brightness::pulse() {
+void Lights::solid() {
+    for (int i = 0; i < NUM_SR; i++) {
+        shiftOut(PIN_ICO_SE, PIN_ICO_CL, MSBFIRST, 0xFF);
+    }
+    analogWrite(PIN_ICO_OE, lvl);
+}
+
+void Lights::pulse() {
     if (lvl >= minm) {
         dir = -1;
     } else if (lvl == maxm) {
@@ -47,7 +54,7 @@ bool check_pwr_sw(bool current, uint8_t brt) {
     }
 }
 
-void LED_Brightness::adjust(int btn_up, int btn_down, uint8_t b) {
+void Lights::adjust(int btn_up, int btn_down, uint8_t b) {
     int amt = 1;
     if (lvl < 125) {
         amt *= 25;

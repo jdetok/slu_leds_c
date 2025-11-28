@@ -34,28 +34,31 @@ extern const size_t PINS_IN_COUNT;
 extern const int PINS_OUT[];
 extern const size_t PINS_OUT_COUNT ;
 
-// LED brightness control
-struct LED_Brightness {
+// Lightsrightness control
+struct Lights {
     int btn_up; // brightness up button
     int btn_dn; // brightness down button
+    int btn_md; // mode button
     uint8_t lvl; // brightness level
     uint8_t minm; // minimum brightness (0-255, higher the number, LOWER the brighness)
     uint8_t maxm; // maximum brightness (0-255, lower the brighter)
     int dir; // direction for pulse (1 or -1)
     bool onoff;
 
-    LED_Brightness(int min_brt, int max_brt);
+    Lights(int min_brt, int max_brt);
     void adjust(int btn_up, int btn_down, uint8_t b);
+    void solid();
     void pulse();
 };
 
-struct BTN_State {
+// EIGHT BUTTONS - state is stored in a uint8_t, each bit used as a flag
+struct Buttons {
     uint8_t persist;
     uint8_t raw;
     uint8_t last;
     int btns[8];
 
-    BTN_State();
+    Buttons();
     uint8_t read();
     void update();
     bool pressed(int btn);
@@ -68,7 +71,7 @@ void setup_pins(const int* pins_arr, size_t count, uint8_t mode);
 // state (buttons/switches) functions
 bool check_pwr_sw(bool current, uint8_t brt);
 
-// led control functions
+// Lightsontrol functions
 void leds_onoff(bool on);
 
 

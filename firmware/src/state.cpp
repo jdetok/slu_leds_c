@@ -1,9 +1,9 @@
 #include "slu_leds.h"
 
-BTN_State::BTN_State() : persist(0), raw(0), last(0) {}
+Buttons::Buttons() : persist(0), raw(0), last(0) {}
 
 // read byte from 74HC165
-uint8_t BTN_State::read() {
+uint8_t Buttons::read() {
     digitalWrite(PIN_ICI_PL, LOW);
     delayMicroseconds(5);
     digitalWrite(PIN_ICI_PL, HIGH);
@@ -17,14 +17,14 @@ uint8_t BTN_State::read() {
 }
 
 // find bits which went from 0 to 1, flip only those bits in persisted state
-void BTN_State::update() {
+void Buttons::update() {
     raw = read();
     uint8_t rising = raw & ~last;
     persist ^= rising;
     last = raw;
 }
 
-bool BTN_State::pressed(int btn) {
+bool Buttons::pressed(int btn) {
     return persist & (1 << btn);
 }
 

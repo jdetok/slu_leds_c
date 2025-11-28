@@ -1,11 +1,11 @@
 #include "slu_leds.h"
 
-// global LED brightness struct
+// global Lightsrightness struct
 // brightness Brightness;
-LED_Brightness* LEDS = new LED_Brightness(255, 155);
+Lights* LEDS = new Lights(255, 155);
 
 // global buttons state
-BTN_State* BTNS = new BTN_State();
+Buttons* BTNS = new Buttons();
 
 void setup() {
     setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
@@ -16,29 +16,14 @@ void setup() {
 
     LEDS->onoff = true;
     leds_onoff(LEDS->onoff);
-    
-    // set default min/max brightness & starting pulse direction
-    
 }
 
 void loop() {
-    // check if power switch is switched
-    bool newOnOff = check_pwr_sw(LEDS->onoff, LEDS->lvl);
-    if (newOnOff != LEDS->onoff) {
-        Serial.println("onoff");
-        leds_onoff(newOnOff);
-    }
-
     BTNS->update();
-
-    LEDS->adjust(0, 4, BTNS->raw);
-
-    // Serial.print("button state: ");
-    // printB(BTN_STATE->persist);
+    LEDS->adjust(3, 2, BTNS->raw);
     
-    // if (BTN_STATE->persist > 0) {
-//     pulse(BRT);    
-    // }
+    // Serial.print("button state: ");
+    // printB(Buttons>persist);
 
     delay(100);
     // delayMicroseconds(1);
