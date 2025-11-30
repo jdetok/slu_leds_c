@@ -5,7 +5,7 @@ Control::Control(
     Lights* l, 
     LCD595* lc,
     uint8_t pwr_sw
-) : btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw) {};
+) : btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), sr_bits(0), total_bits(NUM_SR * 8) {};
 
 void Control::Set() {
     int sw_status = digitalRead(pwr_sw);
@@ -33,6 +33,7 @@ void Control::Set() {
         onoff_last = true;
     }
     btns->update();
+    printB(btns->persist);
     set_brightness();    
     if ((btns->pressed(btns->mode1))) {
         Serial.println("pulse on");
@@ -44,7 +45,7 @@ void Control::Set() {
     if ((btns->pressed(btns->mode2))) {
         Serial.println("chaser on");
         delay_time = 100;
-        leds->bit_chaser(false);
+        bit_chaser(false);
     } else {
         delay_time = 75;
     }
@@ -106,4 +107,38 @@ void Control::brt_down(int amt) {
     lcd->setCursor(0,1);
     lcd->print("level: ");
     lcd->print(String(leds->lvl));
+}
+
+void Control::dly() {
+    delay(delay_time);
+}
+
+void Control::bit_chaser(bool rev) {
+    uint8_t total_bits = NUM_SR * 8;
+
+    for (uint8_t step = 0; step < total_bits; step++) {
+        btns->update();
+        if (btns->changed()) {
+            return;
+        }
+        set_brightness();
+        
+        uint8_t pos = rev ? (total_bits - 1 - step) : step;
+        sr_bits = (1UL << pos);
+        
+        shift_frame();
+        dly();
+    }
+}
+
+void Control::shift_frame() {
+    for (int8_t i = 31; i >= 0; i--) {
+        if (sr_bits & (1UL << i)) {
+            PORTD |= (1 << leds->ic->data);
+        } else {
+            PORTD &= ~( 1 << leds->ic->data);
+        }
+        leds->ic->pulse_pin(0); // clock pulse
+    }
+    leds->ic->pulse_pin(1); // latch pulse
 }

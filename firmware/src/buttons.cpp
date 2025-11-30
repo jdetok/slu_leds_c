@@ -21,6 +21,7 @@ uint8_t ici::read() {
 // find bits which went from 0 to 1, flip only those bits in persisted state
 void Buttons::update() {
     raw = ic->read();
+    lastp = persist; // capture last persist
     uint8_t rising = raw & ~last;
     persist ^= rising;
     last = raw;
@@ -36,4 +37,8 @@ void printB(uint8_t b) {
         Serial.print((b >> i) & 1);
     }
     Serial.println();
+}
+
+bool Buttons::changed() {
+    return persist != lastp;
 }

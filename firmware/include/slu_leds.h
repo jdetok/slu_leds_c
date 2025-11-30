@@ -46,6 +46,7 @@ struct ico {
     ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
     void empty();
     void fill();
+    void pulse_pin(uint8_t clk_latch);
 };
 // 74HC165
 struct ici {
@@ -71,8 +72,7 @@ public:
     Lights(ico* ic, int min_brt, int max_brt);
     void off();
     void out();
-    void pulse();
-    void bit_chaser(bool rev);
+    void pulse();  
 };
 
 // EIGHT BUTTONS - state is stored in a uint8_t, each bit used as a flag
@@ -80,6 +80,7 @@ class Buttons {
 public:    
     ici* ic;
     uint8_t persist;
+    uint8_t lastp;
     uint8_t raw;
     uint8_t last;
 
@@ -95,6 +96,7 @@ public:
     Buttons(ici* ic);
     void update();
     bool pressed(int btn);
+    bool changed();
 };
 
 class Control {
@@ -109,6 +111,9 @@ public:
     bool onoff_last;
 
     int delay_time;
+    uint32_t sr_bits;
+    uint8_t total_bits;
+
 
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
     void Set();
@@ -116,7 +121,9 @@ public:
     int amt_to_change();
     void brt_up(int amt);
     void brt_down(int amt);
-
+    void bit_chaser(bool rev);
+    void dly();
+    void shift_frame();
 };
 
 // pin setup - uses arrays and sizes from above

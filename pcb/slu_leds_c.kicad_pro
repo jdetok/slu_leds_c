@@ -649,7 +649,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "gerbs_quote/",
+      "plot": "/Users/jdeto/mkr/slu_leds_c/pcb/layout/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
