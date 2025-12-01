@@ -49,13 +49,12 @@ struct ico {
     void clear();
     void empty();
     void fill();
-    void set_bit(uint8_t pos);
-    void add_bit(uint8_t pos);
+    void set_bit(uint8_t pos, bool add); // = vs. |=
     void shift();
     void pulse_pin(uint8_t clk_latch);
 };
 
-// Lightsrightness control
+// Lights brightness control
 class Lights {
 public: 
     ico* ic;
@@ -63,7 +62,7 @@ public:
     uint8_t maxm; // maximum brightness (0-255, lower the brighter)
     int dir; // direction for pulse (1 or -1)
     uint8_t lvl; // brightness level
-    bool onoff;
+    uint8_t pulse_max;
     uint8_t total_bits;
 
     Lights(ico* ic, int min_brt, int max_brt);
@@ -71,6 +70,8 @@ public:
     void out();
     void brt_up(int amt);
     void brt_down(int amt);
+    void pulse_brt_up(int amt);
+    void pulse_brt_down(int amt);
     void solid();
     void pulse();  
     void chase(uint8_t pos);
@@ -83,8 +84,8 @@ struct ici {
     uint8_t cp;
     uint8_t data;
     uint8_t ce;
-    // ici(int pl, int cp, int se, int ce);
-    ici() : load(PIN_ICI_PL), cp(PIN_ICI_CP), data(PIN_ICI_SE), ce(PIN_ICI_CE) {};
+
+    ici();
     uint8_t read();
 };
 
@@ -108,8 +109,6 @@ public:
 
     Buttons(ici* ic);
     void update();
-    bool pressed(int btn);
-    bool changed();
 };
 
 class Control {
@@ -124,14 +123,14 @@ public:
     uint8_t chase_idx;
 
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
-    void Run();
+    void run();
+    void dly();
     int amt_to_change();
     void set_brightness();
     void set_speed();
     void spd_up(int amt);
     void spd_down(int amt);
     void update_chase_idx(bool rev);
-    void dly();
 };
 
 // pin setup - uses arrays and sizes from above

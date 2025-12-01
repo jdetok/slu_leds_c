@@ -8,11 +8,20 @@ void printB(uint8_t b) {
     Serial.println();
 }
 
+void print_mask(uint8_t mask[NUM_SR]) {
+    for (int8_t i = 0; i < NUM_SR; i++) {
+        for (int8_t b = 7; b >= 0; b--) {
+            Serial.print((mask[i] >> b) & 1);
+        }
+    }
+    Serial.println();
+}
+
 Control::Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw) : 
     btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), chase_idx(0)
 {}
 
-void Control::Run() {
+void Control::run() {
 // power switch off
     if (!digitalRead(pwr_sw)) {
         Serial.println("off");
@@ -20,9 +29,11 @@ void Control::Run() {
         return;
     }
     
-    // READ BUTTONS
+    // current button reading
     btns->update();
-    printB(btns->persist);
+    set_brightness();
+    set_speed();
+    // printB(btns->persist);
     
     if (btns->persist & (1 << btns->mode1)) {
         leds->pulse();
@@ -36,28 +47,30 @@ void Control::Run() {
     } else {
         leds->solid();
     }
-
-    // analog write leds->lvl to oe pin
-    set_brightness();
+    print_mask(leds->ic->bitmask); 
     leds->out();
-
-    set_speed();
     dly();
 }
 
 void Control::set_brightness() {
     int amt = amt_to_change();
-    if (!(btns->persist & (1 << btns->mode1))) { 
-        if (btns->raw & (1 << btns->brt_up)) {
-            Serial.println("up");
+    if (btns->raw & (1 << btns->brt_up)) {
+        Serial.println("up");
+        if (!(btns->persist & (1 << btns->mode1))) { 
             leds->brt_up(amt);
-        }
-        if (btns->raw & (1 << btns->brt_dn)) {
-            Serial.println("down");
-            leds->brt_down(amt);
+        } else {
+            leds->pulse_brt_up(amt);
         }
     }
-}   
+    if (btns->raw & (1 << btns->brt_dn)) {
+        Serial.println("down");
+        if (!(btns->persist & (1 << btns->mode1))) { 
+            leds->brt_down(amt);
+        } else {
+            leds->pulse_brt_down(amt);
+        }
+    }
+}
 
 int Control::amt_to_change() {
     int amt = 1;

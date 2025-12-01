@@ -1,5 +1,8 @@
 #include "slu_leds.h"
 
+ici::ici() : load(PIN_ICI_PL), cp(PIN_ICI_CP), data(PIN_ICI_SE), ce(PIN_ICI_CE) 
+{}
+
 Buttons::Buttons(ici* ic) : ic(ic), persist(0), raw(0), last(0),
     brt_dn(0), brt_up(1), mode1(2), mode2(3), mode3(4), spd_dn(5),
     spd_up(6), rev(7)
@@ -18,20 +21,9 @@ uint8_t ici::read() {
 
 // find bits which went from 0 to 1, flip only those bits in persisted state
 void Buttons::update() {
-    raw = ic->read();
     lastp = persist; // capture last persist
-    uint8_t rising = raw & ~last;
-    persist ^= rising;
+    raw = ic->read(); // current ic reading
+    uint8_t rising = (raw & ~last); // bits currently 1, 0 last time 
+    persist ^= rising; // xor flip the rising bits
     last = raw;
-}
-
-// exclude brightness/speed buttons
-bool Buttons::pressed(int btn) {
-    return raw & (1 << btn);
-}
-
-// need to ignore 0 and 1
-bool Buttons::changed() {
-    uint8_t ignore = 0b11000000;
-    return (persist & ~ignore) != (lastp & ~ignore);
 }

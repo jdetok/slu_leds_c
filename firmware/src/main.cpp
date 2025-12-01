@@ -34,5 +34,5 @@ void setup() {
 }
 
 void loop() {
-    CTRL->Run();
+    CTRL->run();
 }

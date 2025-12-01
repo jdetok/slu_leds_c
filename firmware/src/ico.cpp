@@ -36,6 +36,7 @@ void ico::empty() {
     memset(bitmask, 0, NUM_SR);
     shift();
 }
+
 void ico::fill() {
     Serial.println("filling");
     memset(bitmask, 0xFF, NUM_SR);
@@ -45,27 +46,22 @@ void ico::fill() {
 // 0 for clock, 1 for latch
 void ico::pulse_pin(uint8_t clk_latch) {
     switch (clk_latch) {
-    case 0: // clock pin
+    case 0:
         PORTD |= (1 << clock);
         PORTD &= ~(1 << clock);
         break;
-    case 1: // latch pin
+    case 1:
         PORTD |= (1 << latch);
         PORTD &= ~(1 << latch);
         break;
     }
 }
-
-void ico::set_bit(uint8_t pos) {
+void ico::set_bit(uint8_t pos, bool add) {
     uint8_t byte_idx = pos / 8;
     uint8_t bit_idx = pos % 8;
-
-    bitmask[byte_idx] = (1 << bit_idx);
-}
-
-void ico::add_bit(uint8_t pos) {
-    uint8_t byte_idx = pos / 8;
-    uint8_t bit_idx = pos % 8;
-
-    bitmask[byte_idx] = (bitmask[byte_idx] |= (1 << bit_idx));
+    if (add) {
+        bitmask[byte_idx] |= (1 << bit_idx);
+    } else {
+        bitmask[byte_idx] = (1 << bit_idx);
+    }
 }
