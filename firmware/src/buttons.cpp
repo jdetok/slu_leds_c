@@ -1,21 +1,18 @@
 #include "slu_leds.h"
 
-// ici::ici(int pl, int cp, int se, int ce) : load(pl), cp(cp), data(se), ce(ce) {}; 
-
-Buttons::Buttons(ici* ic) : ic(ic), persist(0), raw(0), last(0) {};
+Buttons::Buttons(ici* ic) : ic(ic), persist(0), raw(0), last(0),
+    brt_dn(0), brt_up(1), mode1(2), mode2(3), mode3(4), spd_dn(5),
+    spd_up(6), rev(7)
+{}
 
 // read byte from 74HC165
 uint8_t ici::read() {
     digitalWrite(load, LOW);
-    delayMicroseconds(5);
     digitalWrite(load, HIGH);
-    delayMicroseconds(5);
-
     digitalWrite(cp, HIGH);
     digitalWrite(ce, LOW);
     uint8_t incoming = shiftIn(data, cp, MSBFIRST);
     digitalWrite(ce, HIGH);
-    // uint8_t ignore = 0b11000000;
     return ~incoming;
 }
 
@@ -31,14 +28,6 @@ void Buttons::update() {
 // exclude brightness/speed buttons
 bool Buttons::pressed(int btn) {
     return raw & (1 << btn);
-}
-
-// print all 8 bits in a byte
-void printB(uint8_t b) {
-    for (int i = 0; i < 8; i++) {
-        Serial.print((b >> i) & 1);
-    }
-    Serial.println();
 }
 
 // need to ignore 0 and 1

@@ -1,88 +1,63 @@
 #include "slu_leds.h"
 
-Control::Control(
-    Buttons* b, 
-    Lights* l, 
-    LCD595* lc,
-    uint8_t pwr_sw
-) : btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), sr_bits(0), 
-    total_bits(NUM_SR * 8), chase_idx(0),
-    mode_solid(0b00111000),
-    mode_pulse(0b00100000),
-    mode_chase(0b00010000) {};
+// print all 8 bits in a byte
+void printB(uint8_t b) {
+    for (int i = 0; i < 8; i++) {
+        Serial.print((b >> i) & 1);
+    }
+    Serial.println();
+}
+
+Control::Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw) : 
+    btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), chase_idx(0)
+{}
 
 void Control::Run() {
 // power switch off
     if (!digitalRead(pwr_sw)) {
-        Serial.println("switched off");
-        onoff_now = false;
-        if (onoff_last) {
-            Serial.println("off");
-            leds->ic->empty();
-            leds->off();
-        }
-        onoff_last = false;
+        Serial.println("off");
+        leds->off();
         return;
     }
-    // power switch on
-    onoff_now = true;
-    if (!(onoff_last)) {
-        leds->ic->fill();
-        Serial.println("turned on");
-
-        lcd->clear();
-        lcd->setCursor(0,0);
-        lcd->print("LEDs on");
-    }
-    onoff_last = true;
     
     // READ BUTTONS
     btns->update();
     printB(btns->persist);
-
-    // buttons 345 not pressed
-    if (!(btns->persist & mode_solid)) {
-        Serial.println("normal mode")   ;
-        set_brightness();
-    }
-
-    if (btns->persist & (1 << btns->mode1)) {
-        Serial.println("pulse on");
-        leds->pulse();
-    }
     
-    if (btns->persist & (1 << btns->mode2)) {
-        Serial.println("chaser on");
+    if (btns->persist & (1 << btns->mode1)) {
+        leds->pulse();
+    } else if (btns->persist & (1 << btns->mode2)) {
         if (btns->persist & (1 << btns->mode3)) {
             leds->chase4(chase_idx);
         } else {
             leds->chase(chase_idx);
         }
-        
         update_chase_idx(btns->persist & (1 << btns->rev));
-        set_brightness();
+    } else {
+        leds->solid();
     }
 
     // analog write leds->lvl to oe pin
+    set_brightness();
     leds->out();
 
-    // 
     set_speed();
-    Serial.println(delay_time);
     dly();
 }
 
 void Control::set_brightness() {
     int amt = amt_to_change();
-    if (btns->raw & (1 << btns->brt_up)) {
-        Serial.println("up");
-        brt_up(amt);
+    if (!(btns->persist & (1 << btns->mode1))) { 
+        if (btns->raw & (1 << btns->brt_up)) {
+            Serial.println("up");
+            leds->brt_up(amt);
+        }
+        if (btns->raw & (1 << btns->brt_dn)) {
+            Serial.println("down");
+            leds->brt_down(amt);
+        }
     }
-    if (btns->raw & (1 << btns->brt_dn)) {
-        Serial.println("down");
-        brt_down(amt);
-    }
-}
+}   
 
 int Control::amt_to_change() {
     int amt = 1;
@@ -99,33 +74,6 @@ int Control::amt_to_change() {
         amt *= 2;
     }
     return amt;
-}
-
-void Control::brt_up(int amt) {
-    if ((leds->lvl - amt) >= 0) {
-        leds->lvl -= amt;
-    } else if (leds->lvl > 0 && amt > leds->lvl) {
-        leds->lvl -= 1;
-    }
-    lcd->clear();
-    lcd->setCursor(0,0);
-    lcd->print("brt up x");
-    lcd->print(String(amt));
-    lcd->setCursor(0,1);
-    lcd->print("level: ");
-    lcd->print(String(leds->lvl));
-}
-void Control::brt_down(int amt) {
-    if ((leds->lvl + amt) <= 255) {
-        leds->lvl += amt;
-    }
-    lcd->clear();
-    lcd->setCursor(0,0);
-    lcd->print("brt down x");
-    lcd->print(String(amt));
-    lcd->setCursor(0,1);
-    lcd->print("level: ");
-    lcd->print(String(leds->lvl));
 }
 
 void Control::set_speed() {
@@ -159,12 +107,12 @@ void Control::dly() {
 void Control::update_chase_idx(bool rev) {
     if (rev) {
         if (chase_idx == 0) {
-            chase_idx = total_bits;
+            chase_idx = leds->total_bits;
         }
         chase_idx--;
     } else {
         chase_idx++;
-        if (chase_idx >= total_bits) {
+        if (chase_idx >= leds->total_bits) {
             chase_idx = 0;
         }
     }

@@ -1,7 +1,8 @@
 #include "slu_leds.h"
 
 ico::ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), 
-    clock(PIN_ICO_CL), bitmask({0}), total_bits(NUM_SR * 8) {};
+    clock(PIN_ICO_CL) 
+{ memset(bitmask, 0, NUM_SR); }
 
 void ico::shift() {
     for (int8_t i = NUM_SR - 1; i >= 0; i--) {

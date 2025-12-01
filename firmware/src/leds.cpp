@@ -1,7 +1,8 @@
 #include "slu_leds.h"
 
 Lights::Lights(ico* ic, int min_brt, int max_brt)
-    : ic(ic), minm(min_brt), maxm(max_brt), dir(-1), lvl(255), onoff(true)
+    : ic(ic), minm(min_brt), maxm(max_brt), dir(-1), lvl(255), onoff(true),
+        total_bits(NUM_SR * 8)
 {}
 
 void Lights::out() {
@@ -11,6 +12,25 @@ void Lights::out() {
 void Lights::off() {
     ic->empty();
     out();
+}
+
+void Lights::solid() {
+    if (!ic->is_full()) {
+        ic->fill();
+    }
+}
+
+void Lights::brt_up(int amt) {
+    if ((lvl - amt) >= 0) {
+        lvl -= amt;
+    } else if (lvl > 0 && amt > lvl) {
+        lvl -= 1;
+    }
+}
+void Lights::brt_down(int amt) {
+    if ((lvl + amt) <= 255) {
+        lvl += amt;
+    }
 }
 
 void Lights::pulse() {
@@ -30,11 +50,12 @@ void Lights::chase(uint8_t pos) {
     ic->set_bit(pos);
     ic->shift();
 }
+
 void Lights::chase4(uint8_t pos) {
     ic->clear();
-    ic->set_bit(pos % ic->total_bits);
-    ic->add_bit((pos + 2) % ic->total_bits);
-    ic->add_bit((pos + 4) % ic->total_bits);
-    ic->add_bit((pos + 6) % ic->total_bits);
+    ic->set_bit(pos % total_bits);
+    ic->add_bit((pos + 2) % total_bits);
+    ic->add_bit((pos + 4) % total_bits);
+    ic->add_bit((pos + 6) % total_bits);
     ic->shift();
 }

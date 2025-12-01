@@ -35,19 +35,15 @@ extern const size_t PINS_IN_COUNT;
 extern const int PINS_OUT[];
 extern const size_t PINS_OUT_COUNT ;
 
-// 74HC165
+// 74HC595
 struct ico {
     uint8_t data;
     uint8_t out;
     uint8_t latch;
     uint8_t clock;
-    // uint64_t mask;
+
     uint8_t bitmask[NUM_SR];
-    uint8_t total_bits;
 
-
-    // ico(int se, int oe, int la, int cl);
-    // ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
     ico();
     bool is_full();
     void clear();
@@ -57,16 +53,6 @@ struct ico {
     void add_bit(uint8_t pos);
     void shift();
     void pulse_pin(uint8_t clk_latch);
-};
-// 74HC165
-struct ici {
-    uint8_t load;
-    uint8_t cp;
-    uint8_t data;
-    uint8_t ce;
-    // ici(int pl, int cp, int se, int ce);
-    ici() : load(PIN_ICI_PL), cp(PIN_ICI_CP), data(PIN_ICI_SE), ce(PIN_ICI_CE) {};
-    uint8_t read();
 };
 
 // Lightsrightness control
@@ -78,13 +64,28 @@ public:
     int dir; // direction for pulse (1 or -1)
     uint8_t lvl; // brightness level
     bool onoff;
+    uint8_t total_bits;
 
     Lights(ico* ic, int min_brt, int max_brt);
     void off();
     void out();
+    void brt_up(int amt);
+    void brt_down(int amt);
+    void solid();
     void pulse();  
     void chase(uint8_t pos);
     void chase4(uint8_t pos);
+};
+
+// 74HC165
+struct ici {
+    uint8_t load;
+    uint8_t cp;
+    uint8_t data;
+    uint8_t ce;
+    // ici(int pl, int cp, int se, int ce);
+    ici() : load(PIN_ICI_PL), cp(PIN_ICI_CP), data(PIN_ICI_SE), ce(PIN_ICI_CE) {};
+    uint8_t read();
 };
 
 // EIGHT BUTTONS - state is stored in a uint8_t, each bit used as a flag
@@ -116,28 +117,16 @@ public:
     Buttons* btns;
     Lights* leds;
     LCD595* lcd;
-
     int pwr_sw;
 
-    bool onoff_now;
-    bool onoff_last;
-
     int delay_time;
-    uint64_t sr_bits;
-    uint8_t total_bits;
 
     uint8_t chase_idx;
-
-    uint8_t mode_solid;
-    uint8_t mode_pulse;
-    uint8_t mode_chase;
 
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
     void Run();
     int amt_to_change();
     void set_brightness();
-    void brt_up(int amt);
-    void brt_down(int amt);
     void set_speed();
     void spd_up(int amt);
     void spd_down(int amt);
