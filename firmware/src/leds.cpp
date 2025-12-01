@@ -52,7 +52,12 @@ void Lights::pulse() {
     } else if (lvl == maxm) {
         dir = 1;
     }
-    lvl += dir;
+    if (lvl < 125) {
+        lvl += dir * 2;
+    } else {
+        lvl += dir;
+    }
+    
     if (!ic->is_full()) {
         ic->fill();
     } 
