@@ -50,9 +50,11 @@ struct ico {
     // ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
     ico();
     bool is_full();
+    void clear();
     void empty();
     void fill();
     void set_bit(uint8_t pos);
+    void add_bit(uint8_t pos);
     void shift_frame();
     void pulse_pin(uint8_t clk_latch);
 };
@@ -81,6 +83,8 @@ public:
     void off();
     void out();
     void pulse();  
+    void chase(uint8_t pos);
+    void chase4(uint8_t pos);
 };
 
 // EIGHT BUTTONS - state is stored in a uint8_t, each bit used as a flag
@@ -130,7 +134,6 @@ public:
 
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
     void Run();
-    void Set();
     int amt_to_change();
     void set_brightness();
     void brt_up(int amt);
@@ -138,8 +141,7 @@ public:
     void set_speed();
     void spd_up(int amt);
     void spd_down(int amt);
-    void bit_chaser(bool rev);
-    void bit_chaser_2(bool rev);
+    void update_chase_idx(bool rev);
     void dly();
 };
 

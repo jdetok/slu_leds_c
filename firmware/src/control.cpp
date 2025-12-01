@@ -55,7 +55,14 @@ void Control::Run() {
     
     if (btns->persist & (1 << btns->mode2)) {
         Serial.println("chaser on");
-        bit_chaser_2(btns->persist & (1 << btns->rev));
+        if (btns->persist & (1 << btns->mode3)) {
+            leds->chase4(chase_idx);
+        } else {
+            leds->chase(chase_idx);
+        }
+        
+        update_chase_idx(btns->persist & (1 << btns->rev));
+        // bit_chaser_2(btns->persist & (1 << btns->rev));
         set_brightness();
         leds->out();
     }
@@ -63,51 +70,6 @@ void Control::Run() {
     set_speed();
     Serial.println(delay_time);
     dly();
-}
-
-void Control::Set() {
-    // power switch off
-    if (!digitalRead(pwr_sw)) {
-        Serial.println("switched off");
-        onoff_now = false;
-        if (onoff_last) {
-            Serial.println("off");
-            leds->ic->empty();
-            leds->off();
-        }
-        onoff_last = false;
-        return;
-    }
-    // power switch on
-    onoff_now = true;
-    if (!(onoff_last)) {
-        Serial.println("on");
-        lcd->clear();
-        lcd->setCursor(0,0);
-        lcd->print("LEDs on");
-        leds->ic->fill();
-    }
-    onoff_last = true;
-    
-    btns->update();
-    printB(btns->persist);
-
-    // check for normal mode
-    if (!(btns->persist & mode_solid)) {
-        Serial.println("normal mode")   ;
-        set_brightness();
-        leds->out();
-    }
-
-    if (btns->persist & (1 << btns->mode1)) {
-        Serial.println("pulse on");
-        leds->pulse();
-    }
-    if (btns->persist & (1 << btns->mode2)) {
-        Serial.println("chaser on");
-        bit_chaser(false);
-    }
-    
 }
 
 void Control::set_brightness() {
@@ -194,33 +156,7 @@ void Control::dly() {
     delay(delay_time);
 }
 
-void Control::bit_chaser(bool rev) {
-    uint8_t total_bits = NUM_SR * 8;
-
-    for (uint8_t step = 0; step < total_bits; step++) {
-        btns->update();
-        if (btns->changed()) {
-            return;
-        }
-        
-        uint8_t pos = rev ? (total_bits - 1 - step) : step;
-
-        leds->ic->set_bit(pos);
-
-        // leds->ic->mask = (1UL << pos);
-        
-        leds->ic->shift_frame();
-
-        set_brightness();
-        leds->out();
-
-        dly();
-    }
-}
-void Control::bit_chaser_2(bool rev) {
-    leds->ic->set_bit(chase_idx);
-    leds->ic->shift_frame();
-
+void Control::update_chase_idx(bool rev) {
     if (rev) {
         if (chase_idx == 0) {
             chase_idx = total_bits;
