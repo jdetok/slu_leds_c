@@ -8,7 +8,10 @@
 #define D7_BIT 7
 
 LCD595::LCD595(uint8_t dataPin, uint8_t clkPin, uint8_t latchPin)
-    : _data(dataPin), _clk(clkPin), _latch(latchPin) {}
+    : _data(dataPin), _clk(clkPin), _latch(latchPin) {
+        // begin();
+        // setCursor(0, 0);
+    }
 
 void LCD595::begin() {
     pinMode(_data, OUTPUT);

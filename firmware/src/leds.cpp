@@ -1,7 +1,7 @@
 #include "slu_leds.h"
 
-Lights::Lights(ico* ic, int min_brt, int max_brt) : ic(ic), minm(min_brt), 
-    maxm(max_brt), dir(-1), lvl(255), pulse_max(0), total_bits(NUM_SR * 8)
+Lights::Lights(ico* ic) : ic(ic), minm(255), maxm(0),
+    dir(-1), lvl(255), total_bits(NUM_SR * 8)
 {}
 
 void Lights::out() {
@@ -27,20 +27,20 @@ void Lights::brt_up(int amt) {
     }
 }
 void Lights::brt_down(int amt) {
-    if ((lvl + amt) <= 255) {
+    if ((lvl + amt) <= minm) {
         lvl += amt;
     }
 }
 void Lights::pulse_brt_up(int amt) {
-    if ((pulse_max - amt) >= 0) {
-        pulse_max -= amt;
-    } else if (pulse_max > 0 && amt > pulse_max) {
-        pulse_max -= 1;
+    if ((maxm - amt) >= 0) {
+        maxm -= amt;
+    } else if (maxm > 0 && amt > maxm) {
+        maxm -= 1;
     }
 }
 void Lights::pulse_brt_down(int amt) {
-    if ((pulse_max + amt) <= 255) {
-        pulse_max += amt;
+    if ((maxm + amt) <= 255) {
+        maxm += amt;
     }
 }
 void Lights::pulse() {

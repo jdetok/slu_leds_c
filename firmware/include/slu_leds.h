@@ -29,11 +29,13 @@
 // number of shift registers
 #define NUM_SR 4
 
+#define NUM_SPD_OPTS 10
+
 // arrays and sizes for pin setup
-extern const int PINS_IN[];;
+extern const int PINS_IN[];
 extern const size_t PINS_IN_COUNT;
 extern const int PINS_OUT[];
-extern const size_t PINS_OUT_COUNT ;
+extern const size_t PINS_OUT_COUNT;
 
 // 74HC595
 struct ico {
@@ -62,10 +64,9 @@ public:
     uint8_t maxm; // maximum brightness (0-255, lower the brighter)
     int dir; // direction for pulse (1 or -1)
     uint8_t lvl; // brightness level
-    uint8_t pulse_max;
     uint8_t total_bits;
 
-    Lights(ico* ic, int min_brt, int max_brt);
+    Lights(ico* ic);
     void off();
     void out();
     void brt_up(int amt);
@@ -98,14 +99,15 @@ public:
     uint8_t raw;
     uint8_t last;
 
-    uint8_t brt_up;
     uint8_t brt_dn;
+    uint8_t brt_up;
     uint8_t mode1;
     uint8_t mode2;
     uint8_t mode3;
-    uint8_t spd_up;
-    uint8_t spd_dn;
     uint8_t rev;
+    uint8_t spd_dn;
+    uint8_t spd_up;
+    
 
     Buttons(ici* ic);
     void update();
@@ -118,16 +120,21 @@ public:
     LCD595* lcd;
     int pwr_sw;
 
-    int delay_time;
+    uint16_t speeds[NUM_SPD_OPTS];
+    uint8_t speed_opts;
+    uint8_t speed_now; // track index
+    uint16_t delay_time;
 
+    uint8_t max_brt;
     uint8_t chase_idx;
 
-    Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
+    Control(Buttons* b, Lights* l, LCD595* lc, uint8_t sw);
     void run();
     void dly();
     int amt_to_change();
     void set_brightness();
     void set_speed();
+    void set_speed_2();
     void spd_up(int amt);
     void spd_down(int amt);
     void update_chase_idx(bool rev);
@@ -137,5 +144,5 @@ public:
 void setup_pins(const int* pins_arr, size_t count, uint8_t mode);
 
 void printB(uint8_t b);
-
+void print_mask(uint8_t mask[NUM_SR]);
 #endif

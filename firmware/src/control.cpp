@@ -1,73 +1,29 @@
 #include "slu_leds.h"
 
-// print all 8 bits in a byte
-void printB(uint8_t b) {
-    for (int i = 0; i < 8; i++) {
-        Serial.print((b >> i) & 1);
-    }
-    Serial.println();
-}
-
-void print_mask(uint8_t mask[NUM_SR]) {
-    for (int8_t i = 0; i < NUM_SR; i++) {
-        for (int8_t b = 7; b >= 0; b--) {
-            Serial.print((mask[i] >> b) & 1);
-        }
-    }
-    Serial.println();
-}
-
-Control::Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw) : 
-    btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), chase_idx(0)
+Control::Control(Buttons* b, Lights* l, LCD595* lc, uint8_t sw) : 
+    btns(b), leds(l), lcd(lc), pwr_sw(sw), 
+    speeds({
+        1000, 400, 250, 175, 125, 90, 65, 40, 20, 1
+    }), speed_opts(sizeof(speeds) / sizeof(speeds[0])),
+    speed_now(5), chase_idx(0)
 {}
-
-void Control::run() {
-// power switch off
-    if (!digitalRead(pwr_sw)) {
-        Serial.println("off");
-        leds->off();
-        return;
-    }
-    
-    // current button reading
-    btns->update();
-    set_brightness();
-    set_speed();
-    // printB(btns->persist);
-    
-    if (btns->persist & (1 << btns->mode1)) {
-        leds->pulse();
-    } else if (btns->persist & (1 << btns->mode2)) {
-        if (btns->persist & (1 << btns->mode3)) {
-            leds->chase4(chase_idx);
-        } else {
-            leds->chase(chase_idx);
-        }
-        update_chase_idx(btns->persist & (1 << btns->rev));
-    } else {
-        leds->solid();
-    }
-    print_mask(leds->ic->bitmask); 
-    leds->out();
-    dly();
-}
-
+ 
 void Control::set_brightness() {
     int amt = amt_to_change();
     if (btns->raw & (1 << btns->brt_up)) {
         Serial.println("up");
-        if (!(btns->persist & (1 << btns->mode1))) { 
-            leds->brt_up(amt);
-        } else {
+        if (btns->persist & (1 << btns->mode1)) { 
             leds->pulse_brt_up(amt);
+        } else {
+            leds->brt_up(amt);
         }
     }
     if (btns->raw & (1 << btns->brt_dn)) {
         Serial.println("down");
-        if (!(btns->persist & (1 << btns->mode1))) { 
-            leds->brt_down(amt);
-        } else {
+        if (btns->persist & (1 << btns->mode1)) { 
             leds->pulse_brt_down(amt);
+        } else {
+            leds->brt_down(amt);
         }
     }
 }
@@ -89,8 +45,31 @@ int Control::amt_to_change() {
     return amt;
 }
 
+void Control::set_speed_2() {
+    if (btns->raw & (1 << btns->spd_up)) {
+        Serial.println("speed up");
+        if (speed_now >= speed_opts - 1) {
+            if (speed_now > speed_opts) {
+                speed_now = speed_opts - 1;
+            }
+        } else {
+            speed_now += 1;
+        }
+    } else if (btns->raw & (1 << btns->spd_dn)) {
+        Serial.println("speed down");
+        if (speed_now > 0) {
+            speed_now -= 1;
+        }
+    }
+
+    if (delay_time != speeds[speed_now]) {
+        delay_time = speeds[speed_now];
+    }
+}
+
 void Control::set_speed() {
-    int amt = 10;
+
+    int amt = 100;
     if (btns->raw & (1 << btns->spd_up)) {
         Serial.println("up");
         spd_up(amt);
@@ -101,6 +80,9 @@ void Control::set_speed() {
     }
 }
 void Control::spd_up(int amt) {
+    // if (speed_now == speed) {
+    //     return;
+    // }
     if ((delay_time - amt) >= 0) {
         delay_time -= amt;
     } else if (delay_time > 0 && amt > delay_time) {
@@ -108,12 +90,13 @@ void Control::spd_up(int amt) {
     }
 }
 void Control::spd_down(int amt) {
-    if ((delay_time + amt) <= 1000) {
+    if ((delay_time + amt) <= 100000) {
         delay_time += amt;
     }
 }
 
 void Control::dly() {
+    Serial.println(delay_time);
     delay(delay_time);
 }
 
