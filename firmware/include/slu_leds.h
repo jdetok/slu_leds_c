@@ -122,6 +122,8 @@ public:
     uint64_t sr_bits;
     uint8_t total_bits;
 
+    uint8_t chase_idx;
+
     uint8_t mode_solid;
     uint8_t mode_pulse;
     uint8_t mode_chase;
@@ -134,6 +136,7 @@ public:
     void brt_up(int amt);
     void brt_down(int amt);
     void bit_chaser(bool rev);
+    void bit_chaser_2(bool rev);
     void dly();
 };
 

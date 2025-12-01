@@ -6,7 +6,7 @@ Control::Control(
     LCD595* lc,
     uint8_t pwr_sw
 ) : btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), sr_bits(0), 
-    total_bits(NUM_SR * 8),
+    total_bits(NUM_SR * 8), chase_idx(0),
     mode_solid(0b00111000),
     mode_pulse(0b00100000),
     mode_chase(0b00010000) {};
@@ -52,10 +52,12 @@ void Control::Run() {
         leds->pulse();
         leds->out();
     }
-    // if (btns->persist & mode_chase) {
+    
     if (btns->persist & (1 << btns->mode2)) {
         Serial.println("chaser on");
-        bit_chaser(false);
+        bit_chaser_2(btns->persist & (1 << btns->rev));
+        set_brightness();
+        leds->out();
     }
     // run delay
     dly();
@@ -88,9 +90,6 @@ void Control::Set() {
     btns->update();
     printB(btns->persist);
 
-    // set_brightness();    
-    // delay_time = 10;
-
     // check for normal mode
     if (!(btns->persist & mode_solid)) {
         Serial.println("normal mode")   ;
@@ -98,16 +97,10 @@ void Control::Set() {
         leds->out();
     }
 
-    // if (btns->persist & mode_pulse) {
-    //     Serial.println("pulse on");
-    //     leds->pulse();
-    // }
-
     if (btns->persist & (1 << btns->mode1)) {
         Serial.println("pulse on");
         leds->pulse();
     }
-    // if (btns->persist & mode_chase) {
     if (btns->persist & (1 << btns->mode2)) {
         Serial.println("chaser on");
         bit_chaser(false);
@@ -196,5 +189,21 @@ void Control::bit_chaser(bool rev) {
         leds->out();
 
         dly();
+    }
+}
+void Control::bit_chaser_2(bool rev) {
+    leds->ic->set_bit(chase_idx);
+    leds->ic->shift_frame();
+
+    if (rev) {
+        if (chase_idx == 0) {
+            chase_idx = total_bits;
+        }
+        chase_idx--;
+    } else {
+        chase_idx++;
+        if (chase_idx >= total_bits) {
+            chase_idx = 0;
+        }
     }
 }
