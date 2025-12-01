@@ -51,6 +51,6 @@ void setup() {
 }
 
 void loop() {
-    CTRL->Set();
-    delay(CTRL->delay_time);
+    CTRL->Run();
+    // delay(CTRL->delay_time);
 }

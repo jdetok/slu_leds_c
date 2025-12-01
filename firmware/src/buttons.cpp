@@ -15,6 +15,7 @@ uint8_t ici::read() {
     digitalWrite(ce, LOW);
     uint8_t incoming = shiftIn(data, cp, MSBFIRST);
     digitalWrite(ce, HIGH);
+    // uint8_t ignore = 0b11000000;
     return ~incoming;
 }
 
@@ -27,8 +28,9 @@ void Buttons::update() {
     last = raw;
 }
 
+// exclude brightness/speed buttons
 bool Buttons::pressed(int btn) {
-    return persist & (1 << btn);
+    return raw & (1 << btn);
 }
 
 // print all 8 bits in a byte
@@ -39,6 +41,8 @@ void printB(uint8_t b) {
     Serial.println();
 }
 
+// need to ignore 0 and 1
 bool Buttons::changed() {
-    return persist != lastp;
+    uint8_t ignore = 0b11000000;
+    return (persist & ~ignore) != (lastp & ~ignore);
 }

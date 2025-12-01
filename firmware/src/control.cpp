@@ -5,49 +5,112 @@ Control::Control(
     Lights* l, 
     LCD595* lc,
     uint8_t pwr_sw
-) : btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), sr_bits(0), total_bits(NUM_SR * 8) {};
+) : btns(b), leds(l), lcd(lc), pwr_sw(pwr_sw), sr_bits(0), 
+    total_bits(NUM_SR * 8),
+    mode_solid(0b00111000),
+    mode_pulse(0b00100000),
+    mode_chase(0b00010000) {};
 
-void Control::Set() {
-    int sw_status = digitalRead(pwr_sw);
-    if (sw_status == LOW) {
+void Control::Run() {
+// power switch off
+    if (!digitalRead(pwr_sw)) {
+        Serial.println("switched off");
         onoff_now = false;
         if (onoff_last) {
             Serial.println("off");
-            lcd->clear();
-            lcd->setCursor(0,0);
-            lcd->print("LEDs off");
             leds->ic->empty();
             leds->off();
         }
         onoff_last = false;
         return;
-    } else {
-        onoff_now = true;
-        if (!(onoff_last)) {
-            Serial.println("on");
-            lcd->clear();
-            lcd->setCursor(0,0);
-            lcd->print("LEDs on");
-            leds->ic->fill();
-        }
-        onoff_last = true;
     }
+    // power switch on
+    onoff_now = true;
+    if (!(onoff_last)) {
+        leds->ic->fill();
+        Serial.println("turned on");
+
+        lcd->clear();
+        lcd->setCursor(0,0);
+        lcd->print("LEDs on");
+    }
+    onoff_last = true;
+    
+    // READ BUTTONS
     btns->update();
     printB(btns->persist);
-    set_brightness();    
-    if ((btns->pressed(btns->mode1))) {
-        Serial.println("pulse on");
-        delay_time = 10;
-        leds->pulse();
-    } else {
-        delay_time = 75;
+
+    // buttons 345 not pressed
+    if (!(btns->persist & mode_solid)) {
+        Serial.println("normal mode")   ;
+        set_brightness();
+        leds->out();
     }
-    if ((btns->pressed(btns->mode2))) {
+
+    if (btns->persist & (1 << btns->mode1)) {
+        Serial.println("pulse on");
+        leds->pulse();
+        leds->out();
+    }
+    // if (btns->persist & mode_chase) {
+    if (btns->persist & (1 << btns->mode2)) {
         Serial.println("chaser on");
-        delay_time = 100;
         bit_chaser(false);
-    } else {
-        delay_time = 75;
+    }
+    // run delay
+    dly();
+}
+
+void Control::Set() {
+    // power switch off
+    if (!digitalRead(pwr_sw)) {
+        Serial.println("switched off");
+        onoff_now = false;
+        if (onoff_last) {
+            Serial.println("off");
+            leds->ic->empty();
+            leds->off();
+        }
+        onoff_last = false;
+        return;
+    }
+    // power switch on
+    onoff_now = true;
+    if (!(onoff_last)) {
+        Serial.println("on");
+        lcd->clear();
+        lcd->setCursor(0,0);
+        lcd->print("LEDs on");
+        leds->ic->fill();
+    }
+    onoff_last = true;
+    
+    btns->update();
+    printB(btns->persist);
+
+    // set_brightness();    
+    // delay_time = 10;
+
+    // check for normal mode
+    if (!(btns->persist & mode_solid)) {
+        Serial.println("normal mode")   ;
+        set_brightness();
+        leds->out();
+    }
+
+    // if (btns->persist & mode_pulse) {
+    //     Serial.println("pulse on");
+    //     leds->pulse();
+    // }
+
+    if (btns->persist & (1 << btns->mode1)) {
+        Serial.println("pulse on");
+        leds->pulse();
+    }
+    // if (btns->persist & mode_chase) {
+    if (btns->persist & (1 << btns->mode2)) {
+        Serial.println("chaser on");
+        bit_chaser(false);
     }
     
 }
@@ -62,7 +125,6 @@ void Control::set_brightness() {
         Serial.println("down");
         brt_down(amt);
     }
-    leds->out();
 }
 
 int Control::amt_to_change() {
@@ -121,24 +183,18 @@ void Control::bit_chaser(bool rev) {
         if (btns->changed()) {
             return;
         }
-        set_brightness();
         
         uint8_t pos = rev ? (total_bits - 1 - step) : step;
-        sr_bits = (1UL << pos);
+
+        leds->ic->set_bit(pos);
+
+        // leds->ic->mask = (1UL << pos);
         
-        shift_frame();
+        leds->ic->shift_frame();
+
+        set_brightness();
+        leds->out();
+
         dly();
     }
-}
-
-void Control::shift_frame() {
-    for (int8_t i = 31; i >= 0; i--) {
-        if (sr_bits & (1UL << i)) {
-            PORTD |= (1 << leds->ic->data);
-        } else {
-            PORTD &= ~( 1 << leds->ic->data);
-        }
-        leds->ic->pulse_pin(0); // clock pulse
-    }
-    leds->ic->pulse_pin(1); // latch pulse
 }

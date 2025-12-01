@@ -41,11 +41,19 @@ struct ico {
     uint8_t out;
     uint8_t latch;
     uint8_t clock;
+    // uint64_t mask;
+    uint8_t bitmask[NUM_SR];
+    uint8_t total_bits;
+
 
     // ico(int se, int oe, int la, int cl);
-    ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
+    // ico() : data(PIN_ICO_SE), out(PIN_ICO_OE), latch(PIN_ICO_LA), clock(PIN_ICO_CL) {};
+    ico();
+    bool is_full();
     void empty();
     void fill();
+    void set_bit(uint8_t pos);
+    void shift_frame();
     void pulse_pin(uint8_t clk_latch);
 };
 // 74HC165
@@ -111,11 +119,15 @@ public:
     bool onoff_last;
 
     int delay_time;
-    uint32_t sr_bits;
+    uint64_t sr_bits;
     uint8_t total_bits;
 
+    uint8_t mode_solid;
+    uint8_t mode_pulse;
+    uint8_t mode_chase;
 
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
+    void Run();
     void Set();
     void set_brightness();
     int amt_to_change();
@@ -123,7 +135,6 @@ public:
     void brt_down(int amt);
     void bit_chaser(bool rev);
     void dly();
-    void shift_frame();
 };
 
 // pin setup - uses arrays and sizes from above
