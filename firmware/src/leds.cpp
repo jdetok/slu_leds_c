@@ -9,7 +9,7 @@ void Lights::out() {
 }
 
 void Lights::off() {
-    lvl = 255;
+    ic->empty();
     out();
 }
 
@@ -28,7 +28,7 @@ void Lights::pulse() {
 void Lights::chase(uint8_t pos) {
     ic->clear();
     ic->set_bit(pos);
-    ic->shift_frame();
+    ic->shift();
 }
 void Lights::chase4(uint8_t pos) {
     ic->clear();
@@ -36,5 +36,5 @@ void Lights::chase4(uint8_t pos) {
     ic->add_bit((pos + 2) % ic->total_bits);
     ic->add_bit((pos + 4) % ic->total_bits);
     ic->add_bit((pos + 6) % ic->total_bits);
-    ic->shift_frame();
+    ic->shift();
 }

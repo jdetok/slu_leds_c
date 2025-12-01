@@ -55,7 +55,7 @@ struct ico {
     void fill();
     void set_bit(uint8_t pos);
     void add_bit(uint8_t pos);
-    void shift_frame();
+    void shift();
     void pulse_pin(uint8_t clk_latch);
 };
 // 74HC165

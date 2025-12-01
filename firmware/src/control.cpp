@@ -44,13 +44,11 @@ void Control::Run() {
     if (!(btns->persist & mode_solid)) {
         Serial.println("normal mode")   ;
         set_brightness();
-        leds->out();
     }
 
     if (btns->persist & (1 << btns->mode1)) {
         Serial.println("pulse on");
         leds->pulse();
-        leds->out();
     }
     
     if (btns->persist & (1 << btns->mode2)) {
@@ -62,11 +60,13 @@ void Control::Run() {
         }
         
         update_chase_idx(btns->persist & (1 << btns->rev));
-        // bit_chaser_2(btns->persist & (1 << btns->rev));
         set_brightness();
-        leds->out();
     }
-    // run delay
+
+    // analog write leds->lvl to oe pin
+    leds->out();
+
+    // 
     set_speed();
     Serial.println(delay_time);
     dly();
