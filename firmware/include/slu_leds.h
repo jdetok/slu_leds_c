@@ -134,9 +134,6 @@ public:
     int amt_to_change();
     void set_brightness();
     void set_speed();
-    void set_speed_2();
-    void spd_up(int amt);
-    void spd_down(int amt);
     void update_chase_idx(bool rev);
 };
 

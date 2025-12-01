@@ -45,7 +45,7 @@ int Control::amt_to_change() {
     return amt;
 }
 
-void Control::set_speed_2() {
+void Control::set_speed() {
     if (btns->raw & (1 << btns->spd_up)) {
         Serial.println("speed up");
         if (speed_now >= speed_opts - 1) {
@@ -66,35 +66,6 @@ void Control::set_speed_2() {
         delay_time = speeds[speed_now];
     }
 }
-
-void Control::set_speed() {
-
-    int amt = 100;
-    if (btns->raw & (1 << btns->spd_up)) {
-        Serial.println("up");
-        spd_up(amt);
-    }
-    if (btns->raw & (1 << btns->spd_dn)) {
-        Serial.println("down");
-        spd_down(amt);
-    }
-}
-void Control::spd_up(int amt) {
-    // if (speed_now == speed) {
-    //     return;
-    // }
-    if ((delay_time - amt) >= 0) {
-        delay_time -= amt;
-    } else if (delay_time > 0 && amt > delay_time) {
-        delay_time -= 1;
-    }
-}
-void Control::spd_down(int amt) {
-    if ((delay_time + amt) <= 100000) {
-        delay_time += amt;
-    }
-}
-
 void Control::dly() {
     Serial.println(delay_time);
     delay(delay_time);

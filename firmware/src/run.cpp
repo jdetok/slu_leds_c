@@ -11,7 +11,11 @@ void Control::run() {
     // current button reading
     btns->update();
     set_brightness();
-    set_speed_2();
+    set_speed();
+
+    Serial.print(leds->lvl);
+    Serial.print(" | ");
+    Serial.println(leds->maxm);
     // printB(btns->persist);
     
     if (btns->persist & (1 << btns->mode1)) {
