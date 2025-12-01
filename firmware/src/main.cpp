@@ -29,8 +29,8 @@ void setup() {
     CTRL->btns->mode1 = 2;
     CTRL->btns->mode2 = 3;
     CTRL->btns->mode3 = 4;
-    CTRL->btns->mult1 = 5;
-    CTRL->btns->mult2 = 6;
+    CTRL->btns->spd_dn = 5;
+    CTRL->btns->spd_up = 6;
     CTRL->btns->rev = 7;
 
     CTRL->leds->onoff = true;

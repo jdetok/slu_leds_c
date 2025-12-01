@@ -97,8 +97,8 @@ public:
     uint8_t mode1;
     uint8_t mode2;
     uint8_t mode3;
-    uint8_t mult1;
-    uint8_t mult2;
+    uint8_t spd_up;
+    uint8_t spd_dn;
     uint8_t rev;
 
     Buttons(ici* ic);
@@ -131,10 +131,13 @@ public:
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t pwr_sw);
     void Run();
     void Set();
-    void set_brightness();
     int amt_to_change();
+    void set_brightness();
     void brt_up(int amt);
     void brt_down(int amt);
+    void set_speed();
+    void spd_up(int amt);
+    void spd_down(int amt);
     void bit_chaser(bool rev);
     void bit_chaser_2(bool rev);
     void dly();

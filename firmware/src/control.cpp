@@ -60,6 +60,8 @@ void Control::Run() {
         leds->out();
     }
     // run delay
+    set_speed();
+    Serial.println(delay_time);
     dly();
 }
 
@@ -162,6 +164,30 @@ void Control::brt_down(int amt) {
     lcd->setCursor(0,1);
     lcd->print("level: ");
     lcd->print(String(leds->lvl));
+}
+
+void Control::set_speed() {
+    int amt = 10;
+    if (btns->raw & (1 << btns->spd_up)) {
+        Serial.println("up");
+        spd_up(amt);
+    }
+    if (btns->raw & (1 << btns->spd_dn)) {
+        Serial.println("down");
+        spd_down(amt);
+    }
+}
+void Control::spd_up(int amt) {
+    if ((delay_time - amt) >= 0) {
+        delay_time -= amt;
+    } else if (delay_time > 0 && amt > delay_time) {
+        delay_time -= 1;
+    }
+}
+void Control::spd_down(int amt) {
+    if ((delay_time + amt) <= 1000) {
+        delay_time += amt;
+    }
 }
 
 void Control::dly() {
