@@ -46,9 +46,9 @@ void LCD595::setCursor(uint8_t col, uint8_t row) {
     send(0x80 | (col + row_addr[row]), false);
 }
 
-void LCD595::print(const char* s) {
-    while (*s) writeChar(*s++);
-}
+// void LCD595::print(const char* s) {
+//     while (*s) writeChar(*s++);
+// }
 
 void LCD595::print(String s) {
     for (size_t i = 0; i < s.length(); i++)

@@ -1,7 +1,7 @@
 #include "slu_leds.h"
 
 Lights::Lights(ico* ic) : ic(ic), minm(255), maxm(0),
-    dir(-1), lvl(250), total_bits(NUM_SR * 8)
+    dir(-1), lvl(254), total_bits(NUM_SR * 8)
 {}
 
 void Lights::out() {
@@ -32,40 +32,53 @@ void Lights::brt_down(int amt) {
     }
 }
 void Lights::pulse_brt_up(int amt) {
-    if ((maxm - amt) >= 0) {
+    int real_max = 0;
+    if (maxm > real_max) {
         maxm -= amt;
-    } else if (maxm > 0 && amt > maxm) {
-        maxm -= 1;
+        if (maxm < real_max) {
+            maxm = real_max;
+        }
     }
-    if (lvl < maxm) {
-        lvl = maxm;
-    }
+    lvl = maxm;
 }
+
 void Lights::pulse_brt_down(int amt) {
-    if ((maxm + amt) <= 255) {
+    int real_min = 255;
+    if (maxm < real_min) {
         maxm += amt;
+        if (maxm > real_min) {
+            maxm = real_min;
+        }
     }
+    lvl = maxm;
 }
+
 void Lights::pulse() {
     if (lvl >= minm) {
         dir = -1;
     } else if (lvl == maxm) {
         dir = 1;
     }
-    if (lvl < 125) {
+    if (lvl < 50) {
+        lvl += dir * 4;
+    } else if (lvl < 125) {
         lvl += dir * 2;
     } else {
         lvl += dir;
     }
-    
-    if (!ic->is_full()) {
-        ic->fill();
-    } 
 }
 
 void Lights::chase(uint8_t pos) {
     ic->clear();
     ic->set_bit(pos, 0);
+    ic->shift();
+}
+
+
+void Lights::chase2(uint8_t pos) {
+    ic->clear();
+    ic->set_bit(pos % total_bits, 0);
+    ic->set_bit((pos + 2) % total_bits, 1);
     ic->shift();
 }
 
@@ -75,5 +88,11 @@ void Lights::chase4(uint8_t pos) {
     ic->set_bit((pos + 2) % total_bits, 1);
     ic->set_bit((pos + 4) % total_bits, 1);
     ic->set_bit((pos + 6) % total_bits, 1);
+    ic->shift();
+}
+
+void Lights::chase8(uint8_t pos) {
+    ic->clear();
+    ic->set_byte(pos);
     ic->shift();
 }

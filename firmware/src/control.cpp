@@ -1,11 +1,12 @@
 #include "slu_leds.h"
+// #include <string>
 
 Control::Control(Buttons* b, Lights* l, LCD595* lc, uint8_t sw) : 
     btns(b), leds(l), lcd(lc), pwr_sw(sw), 
     speeds({
-        1000, 400, 250, 175, 125, 90, 65, 40, 20, 1
+        500, 350, 250, 150, 125, 100, 75, 50, 25, 1
     }), speed_opts(sizeof(speeds) / sizeof(speeds[0])),
-    speed_now(5), chase_idx(0)
+    speed_now(5), chase_idx(0), chase_modes(4), current_chase(0)
 {}
  
 void Control::set_brightness() {
@@ -25,6 +26,34 @@ void Control::set_brightness() {
         } else {
             leds->brt_down(amt);
         }
+    }
+    leds->out();
+}
+
+void Control::set_chase_mode() {
+    if (btns->raw & (1 << btns->mode3)) {
+        if (current_chase >= chase_modes) {
+            current_chase = 0;
+        } else {
+            current_chase += 1;
+        }
+    }
+}
+
+void Control::bit_chaser() {
+    switch (current_chase) {
+    case 0:
+        leds->chase(chase_idx);
+        break;
+    case 1:
+        leds->chase2(chase_idx);
+        break;
+    case 2:
+        leds->chase4(chase_idx);
+        break;
+    case 3:
+        leds->chase8(chase_idx);
+        break;
     }
 }
 

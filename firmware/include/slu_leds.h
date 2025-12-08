@@ -17,17 +17,27 @@
 #define PIN_ICI_SE 8 // IC pin 7 (QH)
 #define PIN_ICI_CE 9 // IC pin 15 
 
-
 // arduino pins for 74HC595 (optional external LCD)
 #define PIN_LCD_LA 10 // IC pin 12 (RCLK)
 #define PIN_LCD_CL 11 // IC pin 11 (SRCLK)
 #define PIN_LCD_SE 12 // IC pin 14 (SERIAL)
 
+// arduino pins for 74HC595 (optional external LCD)
+#define PIN_PROTO_LCD_LA 8 // IC pin 12 (RCLK)
+#define PIN_PROTO_LCD_CL 7 // IC pin 11 (SRCLK)
+#define PIN_PROTO_LCD_SE 6 // IC pin 14 (SERIAL)
+
+// arduino pins for 74HC165 (buttons)
+#define PIN_PROTO_ICI_PL 12 // IC pin 1 
+#define PIN_PROTO_ICI_CP 11 // IC pin 2
+#define PIN_PROTO_ICI_SE 10 // IC pin 7 (QH)
+#define PIN_PROTO_ICI_CE 9 // IC pin 15
+
 // arduino pins for power switch
 #define PIN_PWR_SW 13
 
 // number of shift registers
-#define NUM_SR 4
+#define NUM_SR 8
 
 #define NUM_SPD_OPTS 10
 
@@ -36,6 +46,11 @@ extern const int PINS_IN[];
 extern const size_t PINS_IN_COUNT;
 extern const int PINS_OUT[];
 extern const size_t PINS_OUT_COUNT;
+
+extern const int PINS_IN_PROTO[];
+extern const size_t PINS_IN_COUNT_PROTO;
+extern const int PINS_OUT_PROTO[];
+extern const size_t PINS_OUT_COUNT_PROTO;
 
 // 74HC595
 struct ico {
@@ -52,6 +67,7 @@ struct ico {
     void empty();
     void fill();
     void set_bit(uint8_t pos, bool add); // = vs. |=
+    void set_byte(uint8_t pos);
     void shift();
     void pulse_pin(uint8_t clk_latch);
 };
@@ -76,7 +92,9 @@ public:
     void solid();
     void pulse();  
     void chase(uint8_t pos);
+    void chase2(uint8_t pos);
     void chase4(uint8_t pos);
+    void chase8(uint8_t pos);
 };
 
 // 74HC165
@@ -128,13 +146,18 @@ public:
     uint8_t max_brt;
     uint8_t chase_idx;
 
+    uint8_t chase_modes;
+    uint8_t current_chase;
+
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t sw);
     void run();
     void dly();
     int amt_to_change();
     void set_brightness();
     void set_speed();
+    void set_chase_mode();
     void update_chase_idx(bool rev);
+    void bit_chaser();
 };
 
 // pin setup - uses arrays and sizes from above

@@ -59,9 +59,22 @@ void ico::pulse_pin(uint8_t clk_latch) {
 void ico::set_bit(uint8_t pos, bool add) {
     uint8_t byte_idx = pos / 8;
     uint8_t bit_idx = pos % 8;
+    Serial.println(bit_idx);
     if (add) {
         bitmask[byte_idx] |= (1 << bit_idx);
     } else {
         bitmask[byte_idx] = (1 << bit_idx);
+    }
+}
+
+void ico::set_byte(uint8_t pos) {
+    uint8_t byte_idx = pos / 8;
+    uint8_t bit_idx = pos % 8;
+    for (int8_t i = 0; i < 16; i++) {    
+        if ((bit_idx + i) < 8) {
+            bitmask[byte_idx] |= (1 << (bit_idx + i));
+        } else {
+            bitmask[byte_idx + 1] |= (1 << (bit_idx + i));
+        }
     }
 }

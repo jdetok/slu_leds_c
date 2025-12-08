@@ -1,5 +1,8 @@
 #include "slu_leds.h"
 
+// 0 for prod board, 1 for prototype board
+const bool PROTO = 0;
+
 // shift register structs
 ici* ic_btns = new ici();
 ico* ic_leds = new ico();
@@ -19,9 +22,15 @@ Control* CTRL = new Control(BTNS, LEDS, LCD, PIN_PWR_SW);
 void setup() {
     Serial.begin(9600);
 
-    setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
-    setup_pins(PINS_OUT, PINS_OUT_COUNT, OUTPUT);
-
+    if (PROTO) {
+        setup_pins(PINS_IN_PROTO,  PINS_IN_COUNT_PROTO,  INPUT);
+        setup_pins(PINS_OUT_PROTO, PINS_OUT_COUNT_PROTO, OUTPUT);    
+    } else {
+        setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
+        setup_pins(PINS_OUT, PINS_OUT_COUNT, OUTPUT);
+    }
+    CTRL->lcd->begin();
+    CTRL->lcd->setCursor(0, 0);
     CTRL->lcd->print("startup complete");
 }
 

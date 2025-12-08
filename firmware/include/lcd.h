@@ -9,7 +9,7 @@ public:
     void clear();
     void home();
     void setCursor(uint8_t col, uint8_t row);
-    void print(const char* s);
+    // void print(const char* s);
     void print(String s);
     void writeChar(uint8_t ch);
 

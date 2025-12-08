@@ -1,36 +1,31 @@
 #include "slu_leds.h"
 
 void Control::run() {
-// power switch off
     if (!digitalRead(pwr_sw)) {
         Serial.println("off");
         leds->off();
         return;
     }
-    
-    // current button reading
-    btns->update();
-    set_brightness();
-    set_speed();
 
-    Serial.print(leds->lvl);
-    Serial.print(" | ");
-    Serial.println(leds->maxm);
-    // printB(btns->persist);
+    btns->update();
+    set_chase_mode();
     
     if (btns->persist & (1 << btns->mode1)) {
         leds->pulse();
-    } else if (btns->persist & (1 << btns->mode2)) {
-        if (btns->persist & (1 << btns->mode3)) {
-            leds->chase4(chase_idx);
-        } else {
-            leds->chase(chase_idx);
-        }
+    }
+    if (btns->persist & (1 << btns->mode2)) {
+        bit_chaser();
         update_chase_idx(btns->persist & (1 << btns->rev));
     } else {
         leds->solid();
     }
     print_mask(leds->ic->bitmask); 
-    leds->out();
+    set_brightness();
+    set_speed();
+    
+    lcd->clear();
+    lcd->setCursor(0, 0); lcd->print("brt: "); lcd->print(String((uint8_t)~leds->lvl)); 
+    lcd->setCursor(0, 1); lcd->print("spd: "); lcd->print(String(delay_time)); 
+
     dly();
 }
