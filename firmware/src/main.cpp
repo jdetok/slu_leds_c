@@ -31,6 +31,9 @@ void setup() {
         setup_pins(PINS_IN,  PINS_IN_COUNT,  INPUT);
         setup_pins(PINS_OUT, PINS_OUT_COUNT, OUTPUT);
     }
+
+    CTRL->leds->set_bit_order();
+
     CTRL->lcd->begin();
     CTRL->lcd->setCursor(0, 0);
     CTRL->lcd->print("startup complete");

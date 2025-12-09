@@ -68,14 +68,6 @@ void Lights::pulse() {
     }
 }
 
-void Lights::chase(uint8_t pos) {
-    ic->clear();
-    ic->set_bit(pos, 0);
-    Serial.println(String(pos % total_bits));
-    Serial.println(String(pos));
-    ic->shift();
-}
-
 
 void Lights::chase2(uint8_t pos) {
     ic->clear();

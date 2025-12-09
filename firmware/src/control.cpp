@@ -6,7 +6,7 @@ Control::Control(Buttons* b, Lights* l, LCD595* lc, uint8_t sw) :
     speeds({
         500, 350, 250, 150, 125, 100, 75, 50, 25, 1
     }), speed_opts(sizeof(speeds) / sizeof(speeds[0])),
-    speed_now(5), chase_idx(0), chase_modes(4), current_chase(0)
+    speed_now(5), chase_idx(0), chase_modes(16), current_chase(0)
 {}
  
 void Control::set_brightness() {
@@ -41,20 +41,7 @@ void Control::set_chase_mode() {
 }
 
 void Control::bit_chaser() {
-    switch (current_chase) {
-    case 0:
-        leds->chase_around(chase_idx);
-        break;
-    case 1:
-        leds->chase2(chase_idx);
-        break;
-    case 2:
-        leds->chase4(chase_idx);
-        break;
-    case 3:
-        leds->chase8(chase_idx);
-        break;
-    }
+    leds->chase(chase_idx, current_chase);
 }
 
 int Control::amt_to_change() {
