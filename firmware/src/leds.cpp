@@ -1,7 +1,7 @@
 #include "slu_leds.h"
 
 Lights::Lights(ico* ic) : ic(ic), minm(255), maxm(0),
-    dir(-1), lvl(254), total_bits(NUM_SR * 8)
+    dir(-1), lvl(254), total_bits(NUM_SR * 8), max_chase_idx(80)
 {}
 
 void Lights::out() {
@@ -71,6 +71,8 @@ void Lights::pulse() {
 void Lights::chase(uint8_t pos) {
     ic->clear();
     ic->set_bit(pos, 0);
+    Serial.println(String(pos % total_bits));
+    Serial.println(String(pos));
     ic->shift();
 }
 

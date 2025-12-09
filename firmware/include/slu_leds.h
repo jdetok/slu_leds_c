@@ -52,6 +52,17 @@ extern const size_t PINS_IN_COUNT_PROTO;
 extern const int PINS_OUT_PROTO[];
 extern const size_t PINS_OUT_COUNT_PROTO;
 
+typedef enum {
+    ICO1,
+    ICO2,
+    ICO3,
+    ICO4,
+    ICO5,
+    ICO6,
+    ICO7,
+    ICO8
+} ICs;
+
 // 74HC595
 struct ico {
     uint8_t data;
@@ -81,6 +92,7 @@ public:
     int dir; // direction for pulse (1 or -1)
     uint8_t lvl; // brightness level
     uint8_t total_bits;
+    uint8_t max_chase_idx;
 
     Lights(ico* ic);
     void off();
@@ -92,6 +104,7 @@ public:
     void solid();
     void pulse();  
     void chase(uint8_t pos);
+    void chase_around(uint8_t pos);
     void chase2(uint8_t pos);
     void chase4(uint8_t pos);
     void chase8(uint8_t pos);

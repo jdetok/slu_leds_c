@@ -1,5 +1,7 @@
 #include "slu_leds.h"
 
+// LED ICs ORDER: 1-> 2-> <-4 <-3 5-> 6-> 7-> 8->
+
 // 0 for prod board, 1 for prototype board
 const bool PROTO = 0;
 

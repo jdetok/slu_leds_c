@@ -8,12 +8,12 @@ void Control::run() {
     }
 
     btns->update();
-    set_chase_mode();
     
     if (btns->persist & (1 << btns->mode1)) {
         leds->pulse();
     }
     if (btns->persist & (1 << btns->mode2)) {
+        set_chase_mode();
         bit_chaser();
         update_chase_idx(btns->persist & (1 << btns->rev));
     } else {

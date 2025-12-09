@@ -43,7 +43,7 @@ void Control::set_chase_mode() {
 void Control::bit_chaser() {
     switch (current_chase) {
     case 0:
-        leds->chase(chase_idx);
+        leds->chase_around(chase_idx);
         break;
     case 1:
         leds->chase2(chase_idx);
@@ -103,12 +103,12 @@ void Control::dly() {
 void Control::update_chase_idx(bool rev) {
     if (rev) {
         if (chase_idx == 0) {
-            chase_idx = leds->total_bits;
+            chase_idx = leds->max_chase_idx;
         }
         chase_idx--;
     } else {
         chase_idx++;
-        if (chase_idx >= leds->total_bits) {
+        if (chase_idx >= leds->max_chase_idx) {
             chase_idx = 0;
         }
     }
