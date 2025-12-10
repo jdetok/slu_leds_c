@@ -1,24 +1,13 @@
 #include "slu_leds.h"
 
-// LED ICs ORDER: 1-> 2-> <-4 <-3 5-> 6-> 7-> 8->
-
 // 0 for prod board, 1 for prototype board
 const bool PROTO = 0;
 
-// shift register structs
 ici* ic_btns = new ici();
 ico* ic_leds = new ico();
-
-// led control
 Lights* LEDS = new Lights(ic_leds);
-
-// global buttons state
 Buttons* BTNS = new Buttons(ic_btns);
-
-// optional LCD screen
 LCD595* LCD = new LCD595(PIN_LCD_SE, PIN_LCD_CL, PIN_LCD_LA);
-
-// main control section
 Control* CTRL = new Control(BTNS, LEDS, LCD, PIN_PWR_SW);
 
 void setup() {
@@ -32,13 +21,45 @@ void setup() {
         setup_pins(PINS_OUT, PINS_OUT_COUNT, OUTPUT);
     }
 
+    CTRL->leds->off();
     CTRL->leds->set_bit_order();
 
     CTRL->lcd->begin();
-    CTRL->lcd->setCursor(0, 0);
-    CTRL->lcd->print("startup complete");
+    CTRL->lcd->println("startup complete", 0);
 }
 
 void loop() {
     CTRL->run();
+}
+
+void Control::run() {
+    if (!digitalRead(pwr_sw)) {
+        lcd->clear();
+        lcd->println("leds off", 0);
+        leds->off();
+        return;
+    }
+
+    btns->update();
+    
+    if (btns->persist & (1 << btns->mode1)) {
+        leds->pulse();
+    }
+    if (btns->persist & (1 << btns->mode2)) {
+        set_chase_mode();
+        bit_chaser();
+        update_chase_idx(btns->persist & (1 << btns->rev));
+    } else {
+        leds->solid();
+    }
+
+    lcd->clear();
+
+    set_brightness();
+    lcd->printvar_u8("brt: ", (uint8_t)~leds->lvl, 0); 
+
+    set_speed();
+    lcd->printvar_i("spd: ", delay_time, 1);
+
+    dly();
 }

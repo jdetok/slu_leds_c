@@ -12,10 +12,10 @@ void ico::shift() {
             } else {
                 PORTD &= ~(1 << data);
             }
-            pulse_pin(0); // clock pulse
+            clock_pulse();
         }
     }
-    pulse_pin(1); // latch pulse
+    latch_pulse();
 }
 
 bool ico::is_full() {
@@ -43,23 +43,19 @@ void ico::fill() {
     shift();
 }
 
-// 0 for clock, 1 for latch
-void ico::pulse_pin(uint8_t clk_latch) {
-    switch (clk_latch) {
-    case 0:
-        PORTD |= (1 << clock);
-        PORTD &= ~(1 << clock);
-        break;
-    case 1:
-        PORTD |= (1 << latch);
-        PORTD &= ~(1 << latch);
-        break;
-    }
+void ico::latch_pulse() {
+    PORTD |= (1 << latch);
+    PORTD &= ~(1 << latch);
 }
+
+void ico::clock_pulse() {
+    PORTD |= (1 << clock);
+    PORTD &= ~(1 << clock);
+}
+
 void ico::set_bit(uint8_t pos, bool add) {
     uint8_t byte_idx = pos / 8;
     uint8_t bit_idx = pos % 8;
-    Serial.println(bit_idx);
     if (add) {
         bitmask[byte_idx] |= (1 << bit_idx);
     } else {

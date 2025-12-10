@@ -67,26 +67,3 @@ void Lights::pulse() {
         lvl += dir;
     }
 }
-
-
-void Lights::chase2(uint8_t pos) {
-    ic->clear();
-    ic->set_bit(pos % total_bits, 0);
-    ic->set_bit((pos + 2) % total_bits, 1);
-    ic->shift();
-}
-
-void Lights::chase4(uint8_t pos) {
-    ic->clear();
-    ic->set_bit(pos % total_bits, 0);
-    ic->set_bit((pos + 2) % total_bits, 1);
-    ic->set_bit((pos + 4) % total_bits, 1);
-    ic->set_bit((pos + 6) % total_bits, 1);
-    ic->shift();
-}
-
-void Lights::chase8(uint8_t pos) {
-    ic->clear();
-    ic->set_byte(pos);
-    ic->shift();
-}

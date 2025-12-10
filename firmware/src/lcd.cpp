@@ -8,10 +8,36 @@
 #define D7_BIT 7
 
 LCD595::LCD595(uint8_t dataPin, uint8_t clkPin, uint8_t latchPin)
-    : _data(dataPin), _clk(clkPin), _latch(latchPin) {
-        // begin();
-        // setCursor(0, 0);
+    : _data(dataPin), _clk(clkPin), _latch(latchPin) 
+{}
+
+void LCD595::print_to_display(String s) {
+    for (size_t i = 0; i < s.length(); i++) {
+        writeChar(s[i]);
     }
+}
+
+void LCD595::println(String s, int row) {
+    Serial.println(s);
+    setCursor(0, row);
+    for (size_t i = 0; i < s.length(); i++) {
+        writeChar(s[i]);
+    }
+}
+
+void LCD595::printvar_i(String s, int v, int row) {
+    Serial.println(s + v);
+    setCursor(0, row);
+    print_to_display(s);
+    print_to_display(String(v));
+}
+
+void LCD595::printvar_u8(String s, uint8_t v, int row) {
+    Serial.println(s + v);
+    setCursor(0, row);
+    print_to_display(s);
+    print_to_display(String(v));
+}
 
 void LCD595::begin() {
     pinMode(_data, OUTPUT);
@@ -44,15 +70,6 @@ void LCD595::home() {
 void LCD595::setCursor(uint8_t col, uint8_t row) {
     static const uint8_t row_addr[] = {0x00, 0x40};
     send(0x80 | (col + row_addr[row]), false);
-}
-
-// void LCD595::print(const char* s) {
-//     while (*s) writeChar(*s++);
-// }
-
-void LCD595::print(String s) {
-    for (size_t i = 0; i < s.length(); i++)
-        writeChar(s[i]);
 }
 
 void LCD595::writeChar(uint8_t ch) {

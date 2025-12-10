@@ -64,12 +64,14 @@ struct ico {
     ico();
     bool is_full();
     void clear();
+    void latch_pulse();
+    void clock_pulse();
     void empty();
     void fill();
     void set_bit(uint8_t pos, bool add); // = vs. |=
     void set_byte(uint8_t pos);
     void shift();
-    void pulse_pin(uint8_t clk_latch);
+    
 };
 
 // Lights brightness control
@@ -95,11 +97,6 @@ public:
     void solid();
     void pulse();  
     void chase(uint8_t pos, uint8_t lit_bits);
-    void chase1(uint8_t pos);
-    // void chase_around(uint8_t pos);
-    void chase2(uint8_t pos);
-    void chase4(uint8_t pos);
-    void chase8(uint8_t pos);
 };
 
 // 74HC165
@@ -130,7 +127,6 @@ public:
     uint8_t rev;
     uint8_t spd_dn;
     uint8_t spd_up;
-    
 
     Buttons(ici* ic);
     void update();
@@ -143,18 +139,15 @@ public:
     LCD595* lcd;
     int pwr_sw;
 
+    int delay_time;
     uint16_t speeds[NUM_SPD_OPTS];
+    
     uint8_t speed_opts;
     uint8_t speed_now; // track index
-    uint16_t delay_time;
-
     uint8_t max_brt;
     uint8_t chase_idx;
-
     uint8_t chase_modes;
     uint8_t current_chase;
-
-    
 
     Control(Buttons* b, Lights* l, LCD595* lc, uint8_t sw);
     void run();

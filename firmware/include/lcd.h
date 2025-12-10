@@ -9,8 +9,10 @@ public:
     void clear();
     void home();
     void setCursor(uint8_t col, uint8_t row);
-    // void print(const char* s);
-    void print(String s);
+    void print_to_display(String s);
+    void println(String s, int row);
+    void printvar_i(String s, int v, int row);
+    void printvar_u8(String s, uint8_t v, int row);
     void writeChar(uint8_t ch);
 
 private:
