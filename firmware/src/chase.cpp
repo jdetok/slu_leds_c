@@ -10,6 +10,7 @@ void Lights::chase(uint8_t pos, uint8_t lit_bits) {
     }
 
     ic->set_bit(bit_order[pos], 0);
+    // ic->set_bit(~bit_order[pos] % max_chase_idx, 1);
 
     for (uint8_t i = 0; i < lit_bits; i++) {
         ic->set_bit(bit_order[pos + (add_bit_pos * i)], 1);
